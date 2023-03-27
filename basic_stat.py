@@ -19,9 +19,11 @@ def preprocessing_quality(df: pd.DataFrame, column:str, min_val=None):
 
 def preprocessing_low(df:pd.DataFrame, value_small_quantile= 0.05, *columns:str | int)->pd.DataFrame:
     """ Preprocess each entries for an existing dataframe """
+    
     for column in columns:
         if isinstance(column, int):
             column = df.columns[column]
+        print(column)
         lim = np.quantile(df[column], value_small_quantile)
         df = df[df[column] > lim]
     return df
@@ -36,38 +38,20 @@ def preprocessing_high(df:pd.DataFrame, value_small_quantile= 0.95, *columns:str
 
     return df
 
-def create_preprocessing(config: dict, *columns: str | int)-> pd.DataFrame:
-    """ Preprocess the dataframe by removing outliers """
-
-    df = pd.read_csv(os.path.join(config["Data"]["backup"],"production_colors.csv"), usecols=config["Data"]["columns_stats"])
-    df = df[df.Line == "ZSK 70.8"]
-
-    for column in columns:
-        print(df[df.columns[column]])
-        if isinstance(column, int):
-            column = df.columns[column]
-        low_lim = np.quantile(df[column], 0.15)
-        print(low_lim)
-        df = df[df[column] > low_lim]
-        # if df.empty:
-        #     continue
-        # high_lim = np.quantile(df[column], 0.95)
-        # df = df[df[column] < high_lim]
-    return df# if not df.empty else df2
-
 def print_simple(data: dict | pd.DataFrame)-> None:
     """ Print all the input compared to the 4 colors """
     if isinstance(data, dict):
         df_print = pd.read_csv(
             os.path.join(config["Data"]["backup"],"production_colors.csv"),
-            usecols=config["Data"]["columns_stats"])
+            usecols=config["Data"]["columns_uwg"])
         df_print = preprocessing_quality(df_print, "a", 0)
         df_print["YI"] = pd.to_numeric(df_print["YI"], downcast="float")
     else:
         df_print = data
-
+    df_print = preprocessing_low(df_print, 0.07, 7, 10)
+    df_print = preprocessing_high(df_print, 0.95, 16)
     # """ Printing """
-    for i in range(5, len(df_print.columns)):
+    for i in [7, 10, 16, 18, 19]:#range(5, len(df_print.columns)):
 
         # df_print = preprocessing(config, i)
         _, axes = plt.subplots(nrows=2, ncols=2, layout="constrained")
@@ -85,6 +69,8 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         axes[0, 1].set_xlabel(df_print.columns[i])
         axes[1, 0].set_xlabel(df_print.columns[i])
         axes[1, 1].set_xlabel(df_print.columns[i])
+
+        plt.title(config["Data"]["columns_uwg_names"][i-5])
 
         plt.show()
 
@@ -151,17 +137,22 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
 
     df= pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors.csv"),
-        usecols=config["Data"]["columns_temperature"])
-    df = df[df.Line == "ZSK 70.8"]
-    df = preprocessing_quality(df, "a", 0)
-    df["YI"] = pd.to_numeric(df["L"], downcast="float")
-    df = preprocessing_low(df, 0.05, 5)
-    df = preprocessing_high(df, 0.95, 10)
-    for i, column in enumerate(df.columns):
-        df[column].hist()
-        plt.title(column)
-        plt.show()
+        os.path.join(config["Data"]["backup"],"production_colors_uwg.csv"),
+        usecols=config["Data"]["columns_uwg"])
+    # print(df)
+    print_simple(df)
+    # df = df[df.Line == "ZSK 70.8"]
+    # df = preprocessing_quality(df, "a", 0)
+    # df["YI"] = pd.to_numeric(df["L"], downcast="float")
+    # df = preprocessing_low(df, 0.05, 5)
+    # df = preprocessing_high(df, 0.95, 10)
+    # df= preprocessing_low(df, 0.07, 5, 10, 16)
+    # df= preprocessing_high(df, 0.95, 15, 11, 16)
+    # print(df)
+    # for i, column in enumerate(df.columns):
+    #     df[column].hist()
+    #     plt.title(column)
+    #     plt.show()
         # if i==0:
         #     continue
         # print(f"{column} :\

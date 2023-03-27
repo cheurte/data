@@ -4,6 +4,7 @@ import numpy as np
 import os, sys
 import argparse
 import re
+from tqdm import tqdm
 # from time import time
 from datetime import datetime
 from tqdm import tqdm
