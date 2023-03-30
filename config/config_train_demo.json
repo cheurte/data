@@ -1,0 +1,40 @@
+{
+    "model": {
+        "type": "fc",
+        "output_classes": 1,
+        "size_hidden_unit": 16
+    },
+    "training": {
+        "loss": "MSE",
+        "optimizer": "adam",
+        "learning_rate": 1e-4,
+        "max_epoch": 2000
+    },
+    "Data": {
+        "colors": "/home/cheurte/Documents/data/data/BP_110_02 colour.csv",
+        "save_backup": true,
+        "batch_size":16,
+        "shuffle":false,
+        "backup": "/home/cheurte/Documents/data/backup/",
+        "columns_uwg_training":[
+            "A2",
+            "A5",
+            "A11",
+            "A13",
+            "A14",
+            "YI"
+        ],
+        "columns_uwg_names":[
+            "Temperatur Anfahrventil",
+            "Druck Schmelze Anfahrventil",
+            "Anpresskraft Hydraulik Granulator",
+            "Messerposition",
+            "Druck Wasser"
+        ]
+    },
+    "visu": {
+        "output": "/home/cheurte/Documents/data/output/fc_1/",
+        "name_model": "model_fc_1"
+
+    }
+}

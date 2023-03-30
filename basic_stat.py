@@ -48,10 +48,11 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         df_print["YI"] = pd.to_numeric(df_print["YI"], downcast="float")
     else:
         df_print = data
-    df_print = preprocessing_low(df_print, 0.07, 7, 10)
-    df_print = preprocessing_high(df_print, 0.95, 16)
+    df_print = preprocessing_low(df_print, 0.07, 5, 15, 21)
+    # df_print = preprocessing_low(df_print, 0.10, 17)
+    # df_print = preprocessing_high(df_print, 0.95, "A11")
     # """ Printing """
-    for i in [7, 10, 16, 18, 19]:#range(5, len(df_print.columns)):
+    for i in range(5, len(df_print.columns)):
 
         # df_print = preprocessing(config, i)
         _, axes = plt.subplots(nrows=2, ncols=2, layout="constrained")
@@ -70,7 +71,7 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         axes[1, 0].set_xlabel(df_print.columns[i])
         axes[1, 1].set_xlabel(df_print.columns[i])
 
-        plt.title(config["Data"]["columns_uwg_names"][i-5])
+        plt.title("".join([config["Data"]["columns_normal"][i], str(i)]))
 
         plt.show()
 
@@ -137,8 +138,8 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
 
     df= pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_uwg.csv"),
-        usecols=config["Data"]["columns_uwg"])
+        os.path.join(config["Data"]["backup"],"production_colors_4_5_9.csv"),
+        usecols=config["Data"]["columns_normal"])
     # print(df)
     print_simple(df)
     # df = df[df.Line == "ZSK 70.8"]
@@ -150,7 +151,10 @@ if __name__=="__main__":
     # df= preprocessing_high(df, 0.95, 15, 11, 16)
     # print(df)
     # for i, column in enumerate(df.columns):
-    #     df[column].hist()
+    #     if i<1:
+    #         continue
+    #     s = gdf[column].values + 1)
+    #     pd.Series(s).hist()
     #     plt.title(column)
     #     plt.show()
         # if i==0:

@@ -1,0 +1,32 @@
+{
+    "model": {
+        "type": "fc2",
+        "output_classes":1,
+        "size_hidden_unit":10
+    },
+    "training": {
+        "loss": "MSE",
+        "optimizer": "adam",
+        "learning_rate": 5e-5,
+        "max_epoch": 80000
+    },
+    "Data": {
+        "colors": "/home/cheurte/Documents/data/data/BP_110_02 colour.csv",
+        "save_backup": true,
+        "batch_size":16,
+        "shuffle":true,
+        "backup": "/home/cheurte/Documents/data/backup/",
+        "columns_uwg_training":[
+            "A2",
+            "YI"
+        ],
+        "columns_uwg_names":[
+            "Temperatur Anfahrventil"
+        ]
+    },
+    "visu": {
+        "output": "/home/cheurte/Documents/data/output/fc_5/",
+        "name_model": "model_fc_5"
+
+    }
+}

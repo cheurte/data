@@ -4,10 +4,9 @@ import numpy as np
 import os, sys
 import argparse
 import re
-from tqdm import tqdm
 # from time import time
 from datetime import datetime
-from tqdm import tqdm
+# from tqdm import tqdm
 
 from utils import read_json, save_backup_dataframe
 from quality import run_cleaning_colors 
@@ -66,9 +65,8 @@ def dowload_production(config, df_quality:pd.DataFrame)->pd.DataFrame:
     for entry in config["Data"]["columns_production"]:
         column = column + f"CAST({entry} AS VARCHAR(10)) AS {entry}, "
     column = column[:-2]
-    # assert False
     """ Downloading data """
-    for _, (_, value) in tqdm(enumerate(df_quality.iterrows())):
+    for _, (_, value) in enumerate(df_quality.iterrows()):
         line = str(value["Line"]).replace("ZSK ","")
         query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'{line}#{value.current_time}\' AND \'{line}#{value.current_time.replace(minute = value.current_time.minute +1)}\') ORDER BY Stamp DESC limit 1 "
         curr_prod = pd.read_sql(query, conn.connectorMess)
@@ -81,7 +79,35 @@ def dowload_production(config, df_quality:pd.DataFrame)->pd.DataFrame:
     df_quality.dropna(axis=0, inplace=True, how="any")
     df_quality.reset_index(inplace=True, drop=True)
     if config["Data"]["save_backup"]:
-        df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors.csv"))
+        df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_4_5_9.csv"))
+        print("production saved")
+    return df_quality 
+
+def dowload_production_uwg(config, df_quality:pd.DataFrame)->pd.DataFrame:
+    """ Download the data from production """
+    conn = SQLcust()
+    column = "SELECT "
+    production = pd.DataFrame()
+
+    """ Getting the column names """
+    for entry in config["Data"]["column_uwg"]:
+        column = column + f"CAST({entry} AS VARCHAR(10)) AS {entry}, "
+    column = column[:-2]
+    """ Downloading data """
+    for _, (_, value) in enumerate(df_quality.iterrows()):
+        line = str(value["Line"]).replace("ZSK ","")
+        query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'UWG{line}#{value.current_time}\' AND \'UWG{line}#{value.current_time.replace(minute = value.current_time.minute +1)}\') ORDER BY Stamp DESC limit 1 "
+        curr_prod = pd.read_sql(query, conn.connectorMess)
+        if curr_prod.empty:
+            curr_prod = pd.Series(np.nan)
+        production = pd.concat([production, curr_prod])
+    production.reset_index(inplace=True, drop=True)
+    df_quality = pd.concat([df_quality, production], axis = 1)
+    df_quality.dropna(axis=1, inplace=True, how="all")
+    df_quality.dropna(axis=0, inplace=True, how="any")
+    df_quality.reset_index(inplace=True, drop=True)
+    if config["Data"]["save_backup"]:
+        df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_uwg.csv"))
         print("production saved")
     return df_quality 
 
@@ -100,5 +126,8 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
     df_quality = run_cleaning_colors(config)
     df_quality = get_exact_date(df_quality)
+    # Get only line 8
+
+    df_quality = df_quality[df_quality.Line != "ZSK 70.8"]
+    df_quality.reset_index(drop=True, inplace=True)
     df_quality = dowload_production(config, df_quality)
-    # print(df_quality)
