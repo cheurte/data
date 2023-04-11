@@ -43,7 +43,8 @@ def print_data_line(data: pd.DataFrame, config:dict)->None:
             config file for saving results
 
     """
-    data.plot(subplots=True, layout=(2, 3), style="*")
+    layout=(2, np.int32(data.shape[1]/2) if data.shape[1]%2 == 0 else np.int32(data.shape[1]/2 +1))
+    data.plot(subplots=True, layout=layout, style="*")
 
     plt.savefig(os.path.join(config["visu"]["output"],f"inputs.png"))
 
@@ -95,7 +96,7 @@ def print_during_training( config,
     plt.ylabel('Value of 197')
     plt.xlabel('Test set')
     title = '0'*(6-len(str(file_number)))+str(file_number)
-    fig.savefig(f'{path}/{title}.png', bbox_inches='tight')
+    plt.savefig(f'{path}/{title}.png', bbox_inches='tight')
     fig.clf()
 
 
@@ -117,7 +118,5 @@ if __name__=="__main__":
         usecols=config_colors["Data"]["columns_uwg_training"],
         index_col=0)
     # print(df_colors) 
-    df_colors = preprocessing_low(df_colors, 0.07, "A2", "A5")
-    df_colors = preprocessing_high(df_colors, 0.95, "A11")
     print_data_line(df_colors, config_colors)
    

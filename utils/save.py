@@ -3,6 +3,9 @@ import os
 import torch
 
 def save_preprocessing(config, mm, ss)->None:
+    if not os.path.exists(config['visu']['output']):
+        os.makedirs(config['visu']['output'])
+
     dump(ss, os.path.join(config['visu']['output'],'ss.bin'), compress=True)
     dump(mm, os.path.join(config['visu']['output'],'mm.bin'), compress=True)
 

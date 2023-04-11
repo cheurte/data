@@ -11,6 +11,7 @@ from print_inputs import evaluate
 
 def test_model(config, save_result = True):
 
+    print(os.path.join(config['visu']['output'], f"model_{config['model']['type']}.pt"))
     assert os.path.exists(os.path.join(config['visu']['output'], f"model_{config['model']['type']}.pt")), "No model trained, maybe create one first"
     assert torch.cuda.is_available()
     with open(os.path.join(config['visu']['output'], f"model_{config['model']['type']}.pt"), 'rb') as f:
@@ -22,7 +23,7 @@ def test_model(config, save_result = True):
     df_result = evaluate(config, valid_data_loader, model)
     
     x = np.arange(df_result.shape[0]) 
-
+    plt.clf()
     plt.plot(x, df_result.y,'*')
     plt.plot(x, df_result.y_hat, 'o')
 

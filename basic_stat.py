@@ -1,7 +1,6 @@
 """ Simple script for basic stat """
 import argparse
 import os
-# import re
 import sys
 
 import matplotlib.pyplot as plt
@@ -23,7 +22,6 @@ def preprocessing_low(df:pd.DataFrame, value_small_quantile= 0.05, *columns:str 
     for column in columns:
         if isinstance(column, int):
             column = df.columns[column]
-        print(column)
         lim = np.quantile(df[column], value_small_quantile)
         df = df[df[column] > lim]
     return df
@@ -48,14 +46,17 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         df_print["YI"] = pd.to_numeric(df_print["YI"], downcast="float")
     else:
         df_print = data
-    df_print = preprocessing_low(df_print, 0.07, 5, 15, 21)
-    # df_print = preprocessing_low(df_print, 0.10, 17)
-    # df_print = preprocessing_high(df_print, 0.95, "A11")
+    df_print = preprocessing_low(df_print, 0.05, 5, 14)
+    df_print = preprocessing_low(df_print, 0.15, 16)
+    # df_print = preprocessing_high(df_print, 0.95, 13, 32)
     # """ Printing """
     for i in range(5, len(df_print.columns)):
 
         # df_print = preprocessing(config, i)
         _, axes = plt.subplots(nrows=2, ncols=2, layout="constrained")
+
+        # plt.title(config["Data"]["columns_uwg_names"][i])
+        plt.title(str(i))
         axes[0, 0].plot(df_print[df_print.columns[i]], df_print[df_print.columns[1]], "*")
         axes[0, 1].plot(df_print[df_print.columns[i]], df_print[df_print.columns[2]], "*")
         axes[1, 0].plot(df_print[df_print.columns[i]], df_print[df_print.columns[3]], "*")
@@ -70,8 +71,6 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         axes[0, 1].set_xlabel(df_print.columns[i])
         axes[1, 0].set_xlabel(df_print.columns[i])
         axes[1, 1].set_xlabel(df_print.columns[i])
-
-        plt.title("".join([config["Data"]["columns_normal"][i], str(i)]))
 
         plt.show()
 
@@ -137,35 +136,34 @@ if __name__=="__main__":
     parser.add_argument("--config", "-c", default=default_config)
     config = read_json(parser.parse_args().config)
 
-    df= pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_4_5_9.csv"),
-        usecols=config["Data"]["columns_normal"])
-    # print(df)
-    print_simple(df)
-    # df = df[df.Line == "ZSK 70.8"]
-    # df = preprocessing_quality(df, "a", 0)
-    # df["YI"] = pd.to_numeric(df["L"], downcast="float")
-    # df = preprocessing_low(df, 0.05, 5)
-    # df = preprocessing_high(df, 0.95, 10)
-    # df= preprocessing_low(df, 0.07, 5, 10, 16)
-    # df= preprocessing_high(df, 0.95, 15, 11, 16)
-    # print(df)
-    # for i, column in enumerate(df.columns):
-    #     if i<1:
-    #         continue
-    #     s = gdf[column].values + 1)
-    #     pd.Series(s).hist()
-    #     plt.title(column)
-    #     plt.show()
-        # if i==0:
-        #     continue
-        # print(f"{column} :\
-        #     mean : {df[column].mean()} \
-        #     std : {df[column].std()}, \
-        #     variance : {df[column].var()}")
-
-    # df = preprocessing_low(df, 0.05, 7)
-    # df = preprocessing_high(df, 0.98, 5)
-    # print(df)
+    df = pd.read_csv(
+        os.path.join(config["Data"]["backup"],"production_colors_uwg.csv"),
+        usecols=config["Data"]["columns_uwg"])
+    plt.plot(np.arange(len(df.YI)), df.YI, "*")
+    plt.show()
     # print_simple(df)
-    # print_qqplot(df)
+    df= preprocessing_low(df, 0.05, "A0")
+    df= preprocessing_low(df, 0.08, "A5")
+    df= preprocessing_high(df, 0.95, "A6", "A11")
+    
+    # df= preprocessing_low(df, 0.05, 5)
+    # df= preprocessing_low(df, 0.15, 18)
+    # df= preprocessing_high(df, 0.95, 13, 32)
+
+    # df= preprocessing_low(df, 0.05, 5, 14)
+    # df= preprocessing_low(df, 0.15, 16)
+
+    for col in df.columns[5:]:
+        try :
+            x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
+            y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
+            sm.qqplot(x, line="45")
+            plt.title(col)
+            plt.show()
+            res = stats.linregress(x, y)
+            plt.plot(x, y, 'o', label='original data')
+            plt.plot(x, res.intercept + res.slope*x, 'r', label='fitted line')
+            plt.title(col + " - " + str(np.square(res.rvalue)) + " - " + str(res.pvalue) )
+            plt.show()
+        except: 
+            continue

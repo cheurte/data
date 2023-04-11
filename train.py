@@ -1,7 +1,7 @@
 import argparse
 import shutil
 import sys
-from tqdm import tqdm
+# from tqdm import tqdm
 import torch
 import torch.nn as nn
 import os
@@ -18,15 +18,18 @@ from print_inputs import print_during_training
 from plot_loss import plot_loss
 from create_video import create_video
 from save import save_fc_Model
+from test_models import test_model
 
 sys.path.append("/home/cheurte/Documents/data/models/")
 from fc1 import linearModel as fc1
 from fc2 import linearModel as fc2
+from fc3 import linearModel as fc3
+from fc4 import linearModel as fc4
 
 
 r"""
 To start a training run the command : 
-nohup python -u <path_to_sript> --args > output.log & 
+nohup python -u <path/to/sript> --args > output.log & 
 """
 
 def train_fc(config):
@@ -41,7 +44,7 @@ def train_fc(config):
 
     train_loader, validate_loader, df_colors = load_data(config_colors=config)
 
-    if config['model']['type']=="fc":
+    if config['model']['type']=="fc1":
         model = fc1(size_input = len(df_colors.columns)-1,
                num_class = config['model']['output_classes'],
                size_hidden = config['model']['size_hidden_unit']).to(device)
@@ -49,6 +52,15 @@ def train_fc(config):
         model = fc2(size_input = len(df_colors.columns)-1,
                num_class = config['model']['output_classes'],
                size_hidden = config['model']['size_hidden_unit']).to(device)
+    elif config['model']['type']=="fc3":
+        model = fc3(size_input = len(df_colors.columns)-1,
+               num_class = config['model']['output_classes'],
+               size_hidden = config['model']['size_hidden_unit']).to(device)
+    elif config['model']['type']=="fc4":
+        model = fc4(size_input = len(df_colors.columns)-1,
+               num_class = config['model']['output_classes'],
+               size_hidden = config['model']['size_hidden_unit']).to(device)
+
     else:
         assert ValueError("Wrong configuration")
 

@@ -37,7 +37,20 @@ def preprocessing_high(df:pd.DataFrame, value_small_quantile= 0.95, *columns:str
 
     return df
 
+def seperate_input_output(df: pd.DataFrame, output:str, *inputs: str):
+    """ Allow to  seperate all the inputs from the outputs """
+    # print([*inputs])
+    if len([*inputs]) == 0:
+        output_index = df.columns.drop(output)
+        output = df.drop(columns=list(output_index.values))
+        inputs= df.drop(columns=output)
+    else:
+        inputs = df.drop(columns= output)
+        output = df.drop(columns=[*inputs])
+    return inputs, output
+
 def load_data(config_colors: dict):
+    """ Load the data for the color """
     device = "cuda:0"
     df_colors = pd.read_csv(
         os.path.join(config_colors["Data"]["backup"],"production_colors_uwg.csv"),
@@ -45,11 +58,11 @@ def load_data(config_colors: dict):
     df_colors = preprocessing_low(df_colors, 0.07, "A11", "A14")
     df_colors = preprocessing_high(df_colors, 0.95, "A11")
     
-    outputs = df_colors.drop(columns=["A11", "A14"])
-    inputs = df_colors.drop(columns= "YI")    
+    inputs, outputs = seperate_input_output(df_colors, "YI")
 
     ss = StandardScaler()
     mm = MinMaxScaler()
+
     inputs_ss = ss.fit_transform(inputs)
     outputs_mm = mm.fit_transform(outputs)
 
