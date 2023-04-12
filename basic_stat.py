@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from scipy import stats
+from scipy.stats import spearmanr, linregress, pearsonr
 from sklearn.preprocessing import StandardScaler
 
 from utils import read_json
@@ -46,10 +46,8 @@ def print_simple(data: dict | pd.DataFrame)-> None:
         df_print["YI"] = pd.to_numeric(df_print["YI"], downcast="float")
     else:
         df_print = data
-    df_print = preprocessing_low(df_print, 0.05, 5, 14)
-    df_print = preprocessing_low(df_print, 0.15, 16)
-    # df_print = preprocessing_high(df_print, 0.95, 13, 32)
-    # """ Printing """
+
+    # Printing
     for i in range(5, len(df_print.columns)):
 
         # df_print = preprocessing(config, i)
@@ -137,33 +135,44 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
 
     df = pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_uwg.csv"),
+        os.path.join(config["Data"]["backup"],"production_colors_uwg_mean.csv"),
         usecols=config["Data"]["columns_uwg"])
-    plt.plot(np.arange(len(df.YI)), df.YI, "*")
-    plt.show()
-    # print_simple(df)
-    df= preprocessing_low(df, 0.05, "A0")
-    df= preprocessing_low(df, 0.08, "A5")
-    df= preprocessing_high(df, 0.95, "A6", "A11")
-    
-    # df= preprocessing_low(df, 0.05, 5)
-    # df= preprocessing_low(df, 0.15, 18)
-    # df= preprocessing_high(df, 0.95, 13, 32)
+    df = df[df.Line=="ZSK 70.8"]
 
-    # df= preprocessing_low(df, 0.05, 5, 14)
-    # df= preprocessing_low(df, 0.15, 16)
+    # for line 8 not uwg    
+    # df= preprocessing_low(df, 0.05, 5, 8, 22)
+    # df= preprocessing_high(df, 0.95, 5, 8, 11, 13)
+    
+    # For not line 8 not uwg
+    # df = preprocessing_low(df, 0.13, 5)
+    # df = preprocessing_low(df, 0.05, 5, 11, 14, 16)
+    # df = preprocessing_high(df, 0.95, 6, 9, 18)
+    # df = preprocessing_high(df, 0.90, 7, 18)
+
+
+    # for mean uwg     
+    df= preprocessing_low(df, 0.05, "A0", "A12")
+    df= preprocessing_high(df, 0.95, "A0","A6")
+
+    # print_simple(data=df)
 
     for col in df.columns[5:]:
-        try :
+        # try :
             x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
             y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
+            if len(np.unique(x))==1:
+                continue
             sm.qqplot(x, line="45")
             plt.title(col)
             plt.show()
-            res = stats.linregress(x, y)
+            res = linregress(x, y)
+            corr_spr= spearmanr(x, y)
+            pears= pearsonr(x, y)
             plt.plot(x, y, 'o', label='original data')
             plt.plot(x, res.intercept + res.slope*x, 'r', label='fitted line')
-            plt.title(col + " - " + str(np.square(res.rvalue)) + " - " + str(res.pvalue) )
+            # plt.title(col + " \n " + str(np.square(res.rvalue)) + " - " + str(res.pvalue)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
+            plt.title(col + " \n " +str(res)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
+
             plt.show()
-        except: 
-            continue
+        # except: 
+            # continue

@@ -19,6 +19,13 @@ def put_time_correct_format(row: pd.Series)-> str:
     else:
         return str(row["Uhrzeit"])
 
+def process_time(value):
+    """ Get the value of time between a range """
+    current_time = value.current_time
+    previous_time = current_time - timedelta(minutes=10)
+    next_time = current_time + timedelta(minutes=10)
+    return previous_time, next_time
+
 def get_exact_date(df_quality:pd.DataFrame)->pd.DataFrame:
     """ find the exact date """
     curr_time = list()
@@ -83,6 +90,43 @@ def dowload_production(config, df_quality:pd.DataFrame)->pd.DataFrame:
         print("production saved")
     return df_quality 
 
+def dowload_production_multiple(config, df_quality:pd.DataFrame)->pd.DataFrame:
+    # df_quality = df_quality[df_quality.Line == "ZSK 70.8"]
+    # df_quality.reset_index(drop=True, inplace=True)
+
+    """ Download the data from production """
+    conn = SQLcust()
+    column = "SELECT "
+    production = pd.DataFrame()
+
+    """ Getting the column names """
+
+    for entry in config["Data"]["columns_production"]:
+        column = column + f"CAST({entry} AS VARCHAR(10)) AS {entry}, "
+    column = column[:-2]
+    """ Downloading data """
+    for _, (_, value) in enumerate(df_quality.iterrows()):
+        line = str(value["Line"]).replace("ZSK ","")
+        previous_time, next_time=process_time(value)
+        query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'{line}#{previous_time}\' AND \'{line}#{next_time}\') ORDER BY Stamp DESC"
+        curr_prod = pd.read_sql(query, conn.connectorMess)
+        if curr_prod.empty:
+            curr_prod = pd.Series(np.nan)
+        else:
+            curr_prod = curr_prod.astype("float")
+            curr_prod = curr_prod.mean(axis=0)
+            curr_prod = pd.DataFrame(data=curr_prod.values.reshape(-1,1).transpose(),columns=config["Data"]["columns_production"])
+        production = pd.concat([production, curr_prod])
+    production.reset_index(inplace=True, drop=True)
+    df_quality = pd.concat([df_quality, production], axis = 1)
+    df_quality.dropna(axis=1, inplace=True, how="all")
+    df_quality.dropna(axis=0, inplace=True, how="any")
+    df_quality.reset_index(inplace=True, drop=True)
+    if config["Data"]["save_backup"]:
+        df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_mean_all.csv"))
+        print("production saved")
+    return df_quality 
+
 def dowload_production_uwg(config, df_quality:pd.DataFrame)->pd.DataFrame:
     """ Download unique data from production """
     conn = SQLcust()
@@ -101,31 +145,23 @@ def dowload_production_uwg(config, df_quality:pd.DataFrame)->pd.DataFrame:
         curr_prod = pd.read_sql(query, conn.connectorMess)
         if curr_prod.empty:
             curr_prod = pd.Series(np.nan)
-        else:
-            print(curr_prod)
-            print(query)
-            print(value)
-            break
-    #     production = pd.concat([production, curr_prod])
-    # production.reset_index(inplace=True, drop=True)
-    # df_quality = pd.concat([df_quality, production], axis = 1)
-    # df_quality.dropna(axis=1, inplace=True, how="all")
-    # df_quality.dropna(axis=0, inplace=True, how="any")
-    # df_quality.reset_index(inplace=True, drop=True)
-    # if config["Data"]["save_backup"]:
-    #     df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_uwg.csv"))
-    #     print("production saved")
-    # return df_quality 
+        production = pd.concat([production, curr_prod])
+    production.reset_index(inplace=True, drop=True)
+    df_quality = pd.concat([df_quality, production], axis = 1)
+    df_quality.dropna(axis=1, inplace=True, how="all")
+    df_quality.dropna(axis=0, inplace=True, how="any")
+    df_quality.reset_index(inplace=True, drop=True)
+    if config["Data"]["save_backup"]:
+        df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_uwg.csv"))
+        print("production saved")
+    return df_quality 
 
-def process_time(value):
-    """ Get the value of time between a range """
-    current_time = value.current_time
-    previous_time = current_time - timedelta(minutes=10)
-    next_time = current_time + timedelta(minutes=10)
-    return previous_time, next_time
 
 def dowload_production_uwg_multiple(config:dict, df_quality: pd.DataFrame)->pd.DataFrame:
     """ Download multiple uwg data """
+    df_quality = df_quality[df_quality.Line == "ZSK 70.8"]
+    df_quality.reset_index(drop=True, inplace=True)
+
     conn = SQLcust()
     column = "SELECT "
     production = pd.DataFrame()
@@ -165,7 +201,6 @@ def dowload_production_uwg_multiple(config:dict, df_quality: pd.DataFrame)->pd.D
         print("production saved")
     return df_quality 
 
-
 if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
@@ -182,8 +217,7 @@ if __name__=="__main__":
     df_quality = run_cleaning_colors(config)
     df_quality = get_exact_date(df_quality)
     # Get only line 8
-    df_quality = df_quality[df_quality.Line == "ZSK 70.8"]
-    df_quality.reset_index(drop=True, inplace=True)
     # df_quality = dowload_production(config, df_quality)
     # dowload_production_uwg(config, df_quality)
-    dowload_production_uwg_multiple(config, df_quality)
+    # dowload_production_uwg_multiple(config, df_quality)
+    dowload_production_multiple(config, df_quality)

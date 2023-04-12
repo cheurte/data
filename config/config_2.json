@@ -65,7 +65,7 @@
             "Feeder_Dos05_Sps_Nettogewicht",
             "Feeder_Dos06_Sps_Nettogewicht",
             "Feeder_Dos08_Sps_Nettogewicht"
-                    ],
+        ],
         "columns_temperature":[
             "Line",
             "L",
