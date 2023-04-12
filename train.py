@@ -13,26 +13,19 @@ sys.path.append("/home/cheurte/Documents/data/")
 from utils import read_json
 
 sys.path.append("/home/cheurte/Documents/data/utils/")
-from training_manager import load_data, train, eval
+from training_manager import load_data, train, eval, chose_model
 from print_inputs import print_during_training
 from plot_loss import plot_loss
 from create_video import create_video
 from save import save_fc_Model
 from test_models import test_model
 
-sys.path.append("/home/cheurte/Documents/data/models/")
-from fc1 import linearModel as fc1
-from fc2 import linearModel as fc2
-from fc3 import linearModel as fc3
-from fc4 import linearModel as fc4
-
-
-r"""
+"""
 To start a training run the command : 
 nohup python -u <path/to/sript> --args > output.log & 
 """
 
-def train_fc(config):
+def train_fc(config)->None:
     r'''
     Start this command to launch a training in background.
     nohup python -u process/train.py -c process/config/fc/config_fc_i.json  > log/fci.log &
@@ -43,27 +36,8 @@ def train_fc(config):
         os.makedirs(config['visu']['output'])
 
     train_loader, validate_loader, df_colors = load_data(config_colors=config)
-
-    if config['model']['type']=="fc1":
-        model = fc1(size_input = len(df_colors.columns)-1,
-               num_class = config['model']['output_classes'],
-               size_hidden = config['model']['size_hidden_unit']).to(device)
-    elif config['model']['type']=="fc2":
-        model = fc2(size_input = len(df_colors.columns)-1,
-               num_class = config['model']['output_classes'],
-               size_hidden = config['model']['size_hidden_unit']).to(device)
-    elif config['model']['type']=="fc3":
-        model = fc3(size_input = len(df_colors.columns)-1,
-               num_class = config['model']['output_classes'],
-               size_hidden = config['model']['size_hidden_unit']).to(device)
-    elif config['model']['type']=="fc4":
-        model = fc4(size_input = len(df_colors.columns)-1,
-               num_class = config['model']['output_classes'],
-               size_hidden = config['model']['size_hidden_unit']).to(device)
-
-    else:
-        assert ValueError("Wrong configuration")
-
+    
+    model = chose_model(config, device, df_colors)
     criterion = nn.MSELoss() # mean-squared error for regression
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['learning_rate'])
 
