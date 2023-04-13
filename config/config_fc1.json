@@ -16,12 +16,8 @@
         "backup": "/home/cheurte/Documents/data/backup/",
         "columns_uwg_training":[
             "A4",
-            "A5",
-            "A11",
             "A13",
             "A14",
-            "A19",
-            "A20",
             "YI"
         ]
     },

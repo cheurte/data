@@ -21,6 +21,8 @@ from fc2 import linearModel as fc2
 from fc3 import linearModel as fc3
 from fc4 import linearModel as fc4
 from fc2_1 import LinearModel as fc2_1
+from fc2_2 import LinearModel as fc2_2
+
 
 def preprocessing_low(df:pd.DataFrame, value_small_quantile= 0.05, *columns:str | int)->pd.DataFrame:
     """ Preprocess each entries for an existing dataframe """
@@ -59,9 +61,12 @@ def load_data(config_colors: dict):
     df_colors = pd.read_csv(
         os.path.join(config_colors["Data"]["backup"],"production_colors_uwg.csv"),
         usecols=config_colors["Data"]["columns_uwg_training"])
-    df_colors = preprocessing_low(df_colors, 0.07, "A11", "A14")
-    df_colors = preprocessing_high(df_colors, 0.95, "A11")
-    
+    # df_colors = preprocessing_low(df_colors, 0.07, "A1")
+    # df_colors = preprocessing_high(df_colors, 0.95, "A11")
+    # df_colors = preprocessing_low(df_colors, 0.06, "A4", "A14")
+    df_colors = preprocessing_low(df_colors, 0.06, "A14")
+
+
     inputs, outputs = seperate_input_output(df_colors, "YI")
 
     ss = StandardScaler()
@@ -132,6 +137,10 @@ def chose_model(config:dict, device:str, df_colors:pd.DataFrame):
                num_class = config['model']['output_classes'],
                size_hidden = config['model']['size_hidden_unit']).to(device)
     elif config['model']['type']=="fc2_1":
+        return fc2_1(size_input = len(df_colors.columns)-1,
+               num_class = config['model']['output_classes'],
+               size_hidden = config['model']['size_hidden_unit']).to(device)
+    elif config['model']['type']=="fc2_2":
         return fc2_1(size_input = len(df_colors.columns)-1,
                num_class = config['model']['output_classes'],
                size_hidden = config['model']['size_hidden_unit']).to(device)

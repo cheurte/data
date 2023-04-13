@@ -209,6 +209,22 @@
             "A29",
             "A30"
         ],
+        "columns_uwg_process":[
+            "Line",
+            "L",
+            "a",
+            "b",
+            "YI",
+            "A4",
+            "A13",
+            "A14"
+
+        ],
+        "columns_uwg_process_name":[
+            "Temperatur Schmelze Anfahrventil", 
+            "Messerposition",
+            "Druck Wasser"
+        ],
         "columns_uwg_names":[
             "Temperatur Adapter",
             "Temperatur Adapter",

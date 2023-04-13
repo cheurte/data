@@ -1,0 +1,28 @@
+{
+    "model": {
+        "type": "fc4",
+        "output_classes":1,
+        "size_hidden_unit":20
+    },
+    "training": {
+        "loss": "MSE",
+        "optimizer": "adam",
+        "learning_rate": 1e-5,
+        "max_epoch":80000 
+    },
+    "Data": {
+        "batch_size":16,
+        "shuffle":false,
+        "backup": "/home/cheurte/Documents/data/backup/",
+        "columns_uwg_training":[
+            "A13",
+            "A14",
+            "YI"
+        ]
+    },
+    "visu": {
+        "output": "/home/cheurte/Documents/data/output/fc4/",
+        "name_model": "model_fc4"
+
+    }
+}

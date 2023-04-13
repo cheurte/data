@@ -1,0 +1,21 @@
+top - 10:30:40 up  2:11,  0 users,  load average: 0.10, 0.11, 0.18
+Tasks:  14 total,   1 running,  13 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :  32014.3 total,  29707.3 free,   1244.4 used,   1062.6 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used.  30389.5 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    2328   1508   1408 S   0.0   0.0   0:00.00 init(Ubun+
+    4 root      20   0    2644    296     68 S   0.0   0.0   0:00.77 init
+    8 root      20   0    2344    108      0 S   0.0   0.0   0:00.00 SessionLe+
+    9 root      20   0    2344    116      0 S   0.0   0.0   0:00.25 Relay(10)
+   10 cheurte   20   0    6304   5252   3328 S   0.0   0.0   0:00.02 bash
+ 3442 cheurte   20   0  113340  38368   7600 S   0.0   0.1   0:59.89 nvim
+ 3444 cheurte   20   0   20.8g 115600  38156 S   0.0   0.4   0:20.22 node
+ 3455 cheurte   20   0    2208   1576   1468 S   0.0   0.0   0:00.02 powershel+
+ 3468 cheurte   20   0 1309328 760388  37048 S   0.0   2.3  15:22.61 node
+ 3512 cheurte   20   0  175788  22352   9172 S   0.0   0.1   0:01.54 python3
+ 6029 cheurte   20   0  608432  57360  36652 S   0.0   0.2   0:00.14 node
+ 6038 cheurte   20   0    5284   3320   2972 S   0.0   0.0   0:00.00 xclip
+ 6082 cheurte   20   0    4784   3264   3012 S   0.0   0.0   0:00.00 bash
+ 6083 cheurte   20   0    7792   3240   2876 R   0.0   0.0   0:00.00 top

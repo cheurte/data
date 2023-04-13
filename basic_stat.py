@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from scipy.stats import spearmanr, linregress, pearsonr
+from scipy.stats import spearmanr, linregress, pearsonr, normaltest
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
 
 from utils import read_json
 
@@ -75,7 +76,7 @@ def print_simple(data: dict | pd.DataFrame)-> None:
 def print_qqplot(df:pd.DataFrame)->None:
     r""" Plot the QQ plot with the Shapiro Wilk test """
     for _ ,(_, item) in enumerate(df.items()):
-        k2, p = stats.normaltest(item.values)
+        k2, p = normaltest(item.values)
         values = np.squeeze(StandardScaler().fit_transform(np.array(item.values).reshape(-1, 1)))
         sm.qqplot(values, line="45")
         plt.title(f"{item.name} \n p = {p}, stat = {k2}")
@@ -122,6 +123,15 @@ def print_independant(df:pd.DataFrame, scale:bool ,*columns: str | int):
     mng.full_screen_toggle()
     plt.show()
 
+def interquantile_range(df):
+    for column in df.columns:
+        try:
+            plt.boxplot(df[column])
+            plt.title(column)
+            plt.show()
+        except:
+            continue
+
 if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
@@ -135,13 +145,18 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
 
     df = pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_uwg_mean.csv"),
-        usecols=config["Data"]["columns_uwg"])
+        os.path.join(config["Data"]["backup"],"production_colors_mean_all.csv"),
+        usecols=config["Data"]["columns_normal"])
     df = df[df.Line=="ZSK 70.8"]
 
+####################################################
+# preprocessing
+###################################################
     # for line 8 not uwg    
-    # df= preprocessing_low(df, 0.05, 5, 8, 22)
-    # df= preprocessing_high(df, 0.95, 5, 8, 11, 13)
+    df= preprocessing_low(df, 0.05, 5, 8, 22)
+    df= preprocessing_low(df, 0.06, 5)
+
+    df= preprocessing_high(df, 0.95, 5, 8, 11, 13)
     
     # For not line 8 not uwg
     # df = preprocessing_low(df, 0.13, 5)
@@ -151,13 +166,40 @@ if __name__=="__main__":
 
 
     # for mean uwg     
-    df= preprocessing_low(df, 0.05, "A0", "A12")
-    df= preprocessing_high(df, 0.95, "A0","A6")
+    # df= preprocessing_low(df, 0.05, "A0", "A12")
+    # df= preprocessing_high(df, 0.95, "A0","A6")
 
+    # Special with chosen inputs
+    # df= preprocessing_low(df, 0.06, "A4", "A14")
+    
+#####################################################
+# print simple
+#####################################################
     # print_simple(data=df)
+#####################################################
+# simple regression 
+#####################################################
+    # df_train = df[:np.int32(0.8*len(df))]
+    # df_test = df[np.int32(0.8*len(df)):]
+    # x_train = df_train[["A13", "A14"]]
+    # y_train = df_train["YI"]
+    # x_test  = df_test[["A13", "A14"]]
+    # y_test  = df_test["YI"]
+    #
+    # regr = LinearRegression().fit(x_train, y_train)
+    # print(regr.coef_)
+    # print(regr.score(x_test, y_test))
+    # pred = regr.predict(x_test)
+    # plt.plot(np.arange(len(pred)), pred, "*")
+    # plt.plot(np.arange(len(pred)), y_test.values, "*")
+    # plt.show()
 
+    # interquantile_range(df)
+####################################################
+# plot linear regression
+###################################################
     for col in df.columns[5:]:
-        # try :
+        try :
             x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
             y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
             if len(np.unique(x))==1:
@@ -168,11 +210,11 @@ if __name__=="__main__":
             res = linregress(x, y)
             corr_spr= spearmanr(x, y)
             pears= pearsonr(x, y)
+            plt.figure(figsize=(10,10))
             plt.plot(x, y, 'o', label='original data')
             plt.plot(x, res.intercept + res.slope*x, 'r', label='fitted line')
             # plt.title(col + " \n " + str(np.square(res.rvalue)) + " - " + str(res.pvalue)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
             plt.title(col + " \n " +str(res)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
-
             plt.show()
-        # except: 
-            # continue
+        except: 
+            continue

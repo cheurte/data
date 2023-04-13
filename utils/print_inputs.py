@@ -104,7 +104,7 @@ if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
     elif "linux" in sys.platform:
-        default_config = "/home/cheurte/Documents/data/config/config_train_demo.json"
+        default_config = "/home/cheurte/Documents/data/config/config_fc1.json"
     else:
         raise ValueError ("On which os are you ?")
 
