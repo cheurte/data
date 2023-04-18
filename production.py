@@ -74,7 +74,7 @@ def dowload_production(config, df_quality:pd.DataFrame)->pd.DataFrame:
     column = column[:-2]
     """ Downloading data """
     for _, (_, value) in enumerate(df_quality.iterrows()):
-        line = str(value["Line"]).replace("ZSK ","")
+        line = str(value["Produktionsanlage"]).replace("ZSK ","")
         query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'{line}#{value.current_time}\' AND \'{line}#{value.current_time.replace(minute = value.current_time.minute +1)}\') ORDER BY Stamp DESC limit 1 "
         curr_prod = pd.read_sql(query, conn.connectorMess)
         if curr_prod.empty:
@@ -98,7 +98,6 @@ def dowload_production_multiple(config, df_quality:pd.DataFrame)->pd.DataFrame:
     conn = SQLcust()
     column = "SELECT "
     production = pd.DataFrame()
-
     """ Getting the column names """
 
     for entry in config["Data"]["columns_production"]:
@@ -106,7 +105,7 @@ def dowload_production_multiple(config, df_quality:pd.DataFrame)->pd.DataFrame:
     column = column[:-2]
     """ Downloading data """
     for _, (_, value) in enumerate(df_quality.iterrows()):
-        line = str(value["Line"]).replace("ZSK ","")
+        line = str(value["Produktionsanlage"]).replace("ZSK ","")
         previous_time, next_time=process_time(value)
         query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'{line}#{previous_time}\' AND \'{line}#{next_time}\') ORDER BY Stamp DESC"
         curr_prod = pd.read_sql(query, conn.connectorMess)
@@ -120,7 +119,11 @@ def dowload_production_multiple(config, df_quality:pd.DataFrame)->pd.DataFrame:
     production.reset_index(inplace=True, drop=True)
     df_quality = pd.concat([df_quality, production], axis = 1)
     df_quality.dropna(axis=1, inplace=True, how="all")
-    df_quality.dropna(axis=0, inplace=True, how="any")
+
+    # print(df_quality)
+    df_quality.dropna(axis=0, inplace=True, how="all")
+    df_quality.fillna(value=0, inplace=True)
+    print(df_quality)
     df_quality.reset_index(inplace=True, drop=True)
     if config["Data"]["save_backup"]:
         df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_mean_all.csv"))
@@ -159,7 +162,7 @@ def dowload_production_uwg(config, df_quality:pd.DataFrame)->pd.DataFrame:
 
 def dowload_production_uwg_multiple(config:dict, df_quality: pd.DataFrame)->pd.DataFrame:
     """ Download multiple uwg data """
-    df_quality = df_quality[df_quality.Line == "ZSK 70.8"]
+    df_quality = df_quality[df_quality.Produktionsanlage== "ZSK 70.8"]
     df_quality.reset_index(drop=True, inplace=True)
 
     conn = SQLcust()
@@ -178,7 +181,7 @@ def dowload_production_uwg_multiple(config:dict, df_quality: pd.DataFrame)->pd.D
                 - Charge
                 - Uhrzeit
         """
-        line = str(value["Line"]).replace("ZSK ","")
+        line = str(value["Produktionsanlage"]).replace("ZSK ","")
         previous_time, next_time=process_time(value)
         query = column + f" FROM AnlagenDaten WHERE (Hybrid BETWEEN \'UWG{line}#{previous_time}\' AND \'UWG{line}#{next_time}\') ORDER BY Stamp DESC"
         curr_prod = pd.read_sql(query, conn.connectorMess)
@@ -195,7 +198,6 @@ def dowload_production_uwg_multiple(config:dict, df_quality: pd.DataFrame)->pd.D
     df_quality.dropna(axis=1, inplace=True, how="all")
     df_quality.dropna(axis=0, inplace=True, how="any")
     df_quality.reset_index(inplace=True, drop=True)
-    print(df_quality)
     if config["Data"]["save_backup"]:
         df_quality.to_csv(os.path.join(config["Data"]["backup"], "production_colors_uwg_mean.csv"))
         print("production saved")
@@ -216,8 +218,10 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
     df_quality = run_cleaning_colors(config)
     df_quality = get_exact_date(df_quality)
+    # print(df_quality)
+    # df_quality = df_quality[df_quality.Produktionsanlage == "ZSK 70.8"]
     # Get only line 8
-    # df_quality = dowload_production(config, df_quality)
+    # dowload_production(config, df_quality)
     # dowload_production_uwg(config, df_quality)
     # dowload_production_uwg_multiple(config, df_quality)
     dowload_production_multiple(config, df_quality)

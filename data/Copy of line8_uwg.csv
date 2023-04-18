@@ -1,0 +1,27 @@
+,,,,
+Column names,Column,Distribution,Relation,r_squared %
+Temperatur Adapter,A0,0.339220218,TRUE,2.33
+Temperatur Anfahrventil,A2,0.41176504,TRUE,18.77
+Temperatur Schmelze Anfahrventil,A4,5.26E-40,TRUE,42.62
+Druck Schmelze Anfahrventil,A5,5.99E-11,TRUE,32.38
+Temperatur Lochplatte,A6,5.52E-14,FALSE,1.57
+Drehzahl Granulator,A8,4.83E-08,FALSE,1.09
+Drehzahl Granulator,A9,4.86E-08,FALSE,1.11
+Anpresskraft Hydraulik Granulator,A10,6.79E-05,FALSE,1.04
+Anpresskraft Hydraulik Granulator,A11,5.11E-15,TRUE,7.64
+Messerposition,A12,2.20E-12,TRUE,2.92
+Druck Wasser,A13,0.000361792,TRUE,22.85
+Drehzahl Wasserpumpe,A14,1.89E-07,TRUE,14.31
+Drehzahl Wasserpumpe,A15,0.123499076,TRUE,12.11
+Wasserdurchfluss,A16,0.122330288,TRUE,11.68
+Niveau Wassertank,A17,5.21E-05,TRUE,1.70
+Temperatur Wasser im Rohr,A18,8.18E-39,TRUE,3.03
+Temperatur Wasser im Tank,A19,8.73E-07,TRUE,5.27
+Temperatur Wasser ,A20,9.86E-13,TRUE,4.52
+Drehzahl Trockner,A21,8.15E-07,TRUE,6.20
+Drehzahl Trockner ,A22,0,FALSE,0.04
+Drehzahl Trockner Gebläse,A23,0,FALSE,0.03
+Drehzahl Trockner Gebläse,A24,0,TRUE,2.94
+Stromstärke Summe,A25,0,FALSE,0.05
+Wirkleistung Summe,A26,0.034400872,TRUE,29.40
+reserve,A27,0.510815422,TRUE,5.47

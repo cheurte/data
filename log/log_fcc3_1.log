@@ -1,0 +1,92 @@
+TRAINING PHASE
+Train Epoch: 999	Train loss: 85.88559673761483	Validation Loss : 75.90108624542215
+Train Epoch: 1999	Train loss: 25.69425664388109	Validation Loss : 60.69431577530506
+Train Epoch: 2999	Train loss: 19.950667417491786	Validation Loss : 65.60518089725988
+Train Epoch: 3999	Train loss: 18.757456682040356	Validation Loss : 64.64270141588294
+Train Epoch: 4999	Train loss: 17.938837091904134	Validation Loss : 62.04954607723495
+Train Epoch: 5999	Train loss: 17.03084635466803	Validation Loss : 59.68827158353487
+Train Epoch: 6999	Train loss: 15.950045881327242	Validation Loss : 58.93304066586819
+Train Epoch: 7999	Train loss: 14.71577980183065	Validation Loss : 60.303546883956336
+Train Epoch: 8999	Train loss: 13.487202978227288	Validation Loss : 63.15178337578301
+Train Epoch: 9999	Train loss: 12.427450836403295	Validation Loss : 65.7700644091613
+Train Epoch: 10999	Train loss: 11.522269927721936	Validation Loss : 67.30387773425244
+Train Epoch: 11999	Train loss: 10.760683657717891	Validation Loss : 68.50666976067794
+Train Epoch: 12999	Train loss: 10.148775740643032	Validation Loss : 69.8203736278773
+Train Epoch: 13999	Train loss: 9.656745923275594	Validation Loss : 71.0121565534872
+Train Epoch: 14999	Train loss: 9.29461725114379	Validation Loss : 72.08421788625934
+Train Epoch: 15999	Train loss: 9.041023156780284	Validation Loss : 73.28961049225988
+Train Epoch: 16999	Train loss: 8.818930817826185	Validation Loss : 75.08881372221637
+Train Epoch: 17999	Train loss: 8.569201349455398	Validation Loss : 77.97133189816765
+Train Epoch: 18999	Train loss: 8.286071175418328	Validation Loss : 81.8027447812665
+Train Epoch: 19999	Train loss: 7.987096209311858	Validation Loss : 85.90840571957044
+Train Epoch: 20999	Train loss: 7.660633880353998	Validation Loss : 90.08693476867906
+Train Epoch: 21999	Train loss: 7.314273856667569	Validation Loss : 94.45365497837173
+Train Epoch: 22999	Train loss: 6.97948016380542	Validation Loss : 98.92958998615335
+Train Epoch: 23999	Train loss: 6.66631227574544	Validation Loss : 103.57013927532559
+Train Epoch: 24999	Train loss: 6.3732283295248635	Validation Loss : 108.49362160471274
+Train Epoch: 25999	Train loss: 6.095351947995368	Validation Loss : 113.64460058759421
+Train Epoch: 26999	Train loss: 5.8106702438381035	Validation Loss : 119.22481814815428
+Train Epoch: 27999	Train loss: 5.493115090386709	Validation Loss : 125.97612345520399
+Train Epoch: 28999	Train loss: 5.168632001790684	Validation Loss : 134.72453589837306
+Train Epoch: 29999	Train loss: 4.9074055890669115	Validation Loss : 144.42371231580017
+Train Epoch: 30999	Train loss: 4.712392610919778	Validation Loss : 152.3089574827515
+Train Epoch: 31999	Train loss: 4.556735755642876	Validation Loss : 157.28707853604675
+Train Epoch: 32999	Train loss: 4.428298826096579	Validation Loss : 159.76277993983686
+Train Epoch: 33999	Train loss: 4.321241220488446	Validation Loss : 160.47203510436472
+Train Epoch: 34999	Train loss: 4.229521817833302	Validation Loss : 160.16328198397193
+Train Epoch: 35999	Train loss: 4.14735091640614	Validation Loss : 159.48535653303992
+Train Epoch: 36999	Train loss: 4.070445993740577	Validation Loss : 158.93253476539488
+Train Epoch: 37999	Train loss: 3.996314783580601	Validation Loss : 158.8765903876915
+Train Epoch: 38999	Train loss: 3.924069137123297	Validation Loss : 159.53211165259083
+Train Epoch: 39999	Train loss: 3.8535793594055576	Validation Loss : 160.86991075089887
+Train Epoch: 40999	Train loss: 3.7843864519963972	Validation Loss : 162.55928230467467
+Train Epoch: 41999	Train loss: 3.7157719083188567	Validation Loss : 164.1708230288891
+Train Epoch: 42999	Train loss: 3.6481221901776735	Validation Loss : 165.43298707491883
+Train Epoch: 43999	Train loss: 3.5835709974053316	Validation Loss : 166.32315311583025
+Train Epoch: 44999	Train loss: 3.5246653834474273	Validation Loss : 166.970847567488
+Train Epoch: 45999	Train loss: 3.472758399642771	Validation Loss : 167.48102418995921
+Train Epoch: 46999	Train loss: 3.4276919628464384	Validation Loss : 167.87778234536265
+Train Epoch: 47999	Train loss: 3.3884032924543135	Validation Loss : 168.18765831319615
+Train Epoch: 48999	Train loss: 3.353614119172562	Validation Loss : 168.4872765532139
+Train Epoch: 49999	Train loss: 3.322250051656738	Validation Loss : 168.86490458508413
+Train Epoch: 50999	Train loss: 3.2935942918848014	Validation Loss : 169.35231685631481
+Train Epoch: 51999	Train loss: 3.2672430362727027	Validation Loss : 169.94172967610987
+Train Epoch: 52999	Train loss: 3.243013215615065	Validation Loss : 170.5928350354342
+Train Epoch: 53999	Train loss: 3.2207829094841145	Validation Loss : 171.23982554507225
+Train Epoch: 54999	Train loss: 3.2003588790394133	Validation Loss : 171.81527452199202
+Train Epoch: 55999	Train loss: 3.181372154809651	Validation Loss : 172.2624065954841
+Train Epoch: 56999	Train loss: 3.1632993738458026	Validation Loss : 172.55356091663575
+Train Epoch: 57999	Train loss: 3.1455285753618227	Validation Loss : 172.6924757670767
+Train Epoch: 58999	Train loss: 3.127447240811307	Validation Loss : 172.722197147167
+Train Epoch: 59999	Train loss: 3.1085547736875014	Validation Loss : 172.69101056177544
+Train Epoch: 60999	Train loss: 3.0885182609490585	Validation Loss : 172.6570506866565
+Train Epoch: 61999	Train loss: 3.0672340140736196	Validation Loss : 172.65184748220312
+Train Epoch: 62999	Train loss: 3.0447934641706524	Validation Loss : 172.68638129634977
+Train Epoch: 63999	Train loss: 3.021480540592165	Validation Loss : 172.7571642854355
+Train Epoch: 64999	Train loss: 2.997844799218001	Validation Loss : 172.84052102695205
+Train Epoch: 65999	Train loss: 2.974611065008503	Validation Loss : 172.8939094910296
+Train Epoch: 66999	Train loss: 2.952364714037685	Validation Loss : 172.87545054131817
+Train Epoch: 67999	Train loss: 2.931282969577296	Validation Loss : 172.74122794674352
+Train Epoch: 68999	Train loss: 2.9110900391169707	Validation Loss : 172.4820325614996
+Train Epoch: 69999	Train loss: 2.891271551634418	Validation Loss : 172.10270426090221
+Train Epoch: 70999	Train loss: 2.8712553021978238	Validation Loss : 171.646134878711
+Train Epoch: 71999	Train loss: 2.850416384746495	Validation Loss : 171.17506564913475
+Train Epoch: 72999	Train loss: 2.82812792648474	Validation Loss : 170.79619362904273
+Train Epoch: 73999	Train loss: 2.8041335009329487	Validation Loss : 170.65541191207686
+Train Epoch: 74999	Train loss: 2.7791791925337748	Validation Loss : 170.83465542635201
+Train Epoch: 75999	Train loss: 2.7543183758170926	Validation Loss : 171.27118586196946
+Train Epoch: 76999	Train loss: 2.729860124803963	Validation Loss : 171.9095310265787
+Train Epoch: 77999	Train loss: 2.7058032706700033	Validation Loss : 172.77830031755823
+Train Epoch: 78999	Train loss: 2.682273839971458	Validation Loss : 173.91020513648746
+Train Epoch: 79999	Train loss: 2.6594737909763353	Validation Loss : 175.3177077948175
+Test of the model
+/home/cheurte/Documents/data/output/fcc3_1/model_fcc3.pt
+<bound method Module.parameters of LinearModel(
+  (fc1): Linear(in_features=8, out_features=10, bias=True)
+  (fc2): Linear(in_features=10, out_features=20, bias=True)
+  (fc3): Linear(in_features=20, out_features=10, bias=True)
+  (fc_out): Linear(in_features=10, out_features=1, bias=True)
+)>
+MSE : 5.3631911277771	MSE to beat : 2.5921116068626815
+MAE : 2.1671407222747803	MAE to beat : 1.472120994471873
+time taken : 3165.482332468033

@@ -9,9 +9,7 @@ from time import time
 import matplotlib.pyplot as plt
 from pandas import DataFrame
 
-sys.path.append("/home/cheurte/Documents/data/")
 from utils import read_json
-
 sys.path.append("/home/cheurte/Documents/data/utils/")
 from training_manager import load_data, train, eval, chose_model
 from print_inputs import print_during_training
@@ -26,7 +24,7 @@ nohup python -u <path/to/sript> --args > output.log &
 """
 
 def train_fc(config)->None:
-    r'''
+    '''
     Start this command to launch a training in background.
     nohup python -u process/train.py -c process/config/fc/config_fc_i.json  > log/fci.log &
     '''
@@ -86,7 +84,7 @@ def train_fc(config)->None:
     print("Test of the model")
     test_model(config, True)
     print(f"time taken : {end-start}")
-
+    
 if __name__=='__main__':
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"

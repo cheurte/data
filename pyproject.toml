@@ -1,0 +1,12 @@
+[tool.pyright]
+include = ["utils/", 
+        "models/"]
+
+reportMissingImports = false
+reportMissingTypeStubs = false
+
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+
+executionEnvironments = [
+]

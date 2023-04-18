@@ -1,6 +1,7 @@
 """ Simple script for basic stat """
 import argparse
 import os
+from ssl import DefaultVerifyPaths
 import sys
 
 import matplotlib.pyplot as plt
@@ -123,13 +124,13 @@ def print_independant(df:pd.DataFrame, scale:bool ,*columns: str | int):
     mng.full_screen_toggle()
     plt.show()
 
-def interquantile_range(df):
+def interquantile_range(df:pd.DataFrame):
     for column in df.columns:
         try:
             plt.boxplot(df[column])
             plt.title(column)
             plt.show()
-        except:
+        except BaseException as _:
             continue
 
 if __name__=="__main__":
@@ -145,19 +146,27 @@ if __name__=="__main__":
     config = read_json(parser.parse_args().config)
 
     df = pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_mean_all.csv"),
-        usecols=config["Data"]["columns_normal"])
+        os.path.join(config["Data"]["backup"],"production_colors_uwg_mean.csv"),
+        usecols=config["Data"]["columns_uwg"])
     df = df[df.Line=="ZSK 70.8"]
 
 ####################################################
 # preprocessing
 ###################################################
-    # for line 8 not uwg    
-    df= preprocessing_low(df, 0.05, 5, 8, 22)
-    df= preprocessing_low(df, 0.06, 5)
+    # for line 8 not uwg
+    # df= preprocessing_low(df, 0.10, 5, 9, 10, 15, 33)
+    # df = preprocessing_high(df, 0.95, 5)
+    # df= preprocessing_low(df, 0.10, 5,  9)
+    # df= preprocessing_low(df, 0.05,   9)
+    #
+    # df= preprocessing_high(df, 0.90, 5, 7, 8, 9, 10, 11, 12, 13)
+    # df= preprocessing_high(df, 0.90, 7)
 
-    df= preprocessing_high(df, 0.95, 5, 8, 11, 13)
-    
+
+    # not 8 not uwg
+    # df= preprocessing_low(df, 0.10, 5, 17)
+    # df= preprocessing_high(df, 0.95,13, 14,  16)
+
     # For not line 8 not uwg
     # df = preprocessing_low(df, 0.13, 5)
     # df = preprocessing_low(df, 0.05, 5, 11, 14, 16)
@@ -165,56 +174,93 @@ if __name__=="__main__":
     # df = preprocessing_high(df, 0.90, 7, 18)
 
 
-    # for mean uwg     
-    # df= preprocessing_low(df, 0.05, "A0", "A12")
-    # df= preprocessing_high(df, 0.95, "A0","A6")
+    # for mean uwg line 8
+    # df= preprocessing_low(df, 0.07, "A0", "A2","A12", "A18")
+    # df= preprocessing_high(df, 0.95, "A0","A5","A6")
 
     # Special with chosen inputs
     # df= preprocessing_low(df, 0.06, "A4", "A14")
-    
+
 #####################################################
 # print simple
 #####################################################
     # print_simple(data=df)
 #####################################################
-# simple regression 
+# simple regression
 #####################################################
     # df_train = df[:np.int32(0.8*len(df))]
     # df_test = df[np.int32(0.8*len(df)):]
-    # x_train = df_train[["A13", "A14"]]
+    # x_train = df_train[["Temperatures_Reg11_Sps_Istwert","Temperatures_Reg12_Sps_Istwert"]]
     # y_train = df_train["YI"]
-    # x_test  = df_test[["A13", "A14"]]
+    # x_test  = df_test[["Temperatures_Reg11_Sps_Istwert","Temperatures_Reg12_Sps_Istwert"]]
     # y_test  = df_test["YI"]
     #
     # regr = LinearRegression().fit(x_train, y_train)
-    # print(regr.coef_)
-    # print(regr.score(x_test, y_test))
+    # # print(regr.coef_)
+    # # print(regr.score(x_test, y_test))
     # pred = regr.predict(x_test)
     # plt.plot(np.arange(len(pred)), pred, "*")
     # plt.plot(np.arange(len(pred)), y_test.values, "*")
     # plt.show()
+    # column_tested = ['Temperatures_Reg11_Sps_Istwert', 'Temperatures_Reg12_Sps_Istwert', 'Misc_Hat_Sps_Drehmoment_Istwert', 'Feeder_Dos04_Sps_MotorStellwert', 'Feeder_Dos02_Sps_Dosierfaktor','Feeder_Dos04_Sps_MotorDrehzahl','Feeder_Dos05_Sps_MotorStellwert', 'Feeder_Dos04_Sps_Dosierfaktor', 'Feeder_Dos05_Sps_Dosierfaktor', 'Feeder_Dos05_Sps_MotorDrehzahl']
+    # column_tested = ['A4', 'A5', 'A13', 'A26' , 'A2', 'A14', 'A15', 'A16']
+    # column_tested = ['Temperatures_Reg09_Sps_Istwert', 'Temperatures_AE_Materialtemperatur01', 'Feeder_Dos03_Sps_Dosierfaktor']
+    # x = df[column_tested]
+    # y = df["YI"]
+    # # x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
+    # # y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
+    #
+    # regr = LinearRegression().fit(x, y)
+    # # print(regr.coef_)
+    # # print(regr.intercept_)
+    # print(regr.score(x, y))
+    # pred = regr.predict(x)
+    # col = " - ".join(column_tested)
+    # plt.title(f"Score : {regr.score(x, y)*100}%\nInput of the model {col}")
+    # plt.xlabel("enumeration of YI values")
+    # plt.ylabel("YI value")
+    # plt.plot(np.arange(len(pred)), pred, "*")
+    # plt.plot(np.arange(len(pred)), y.values, "*")
+    # plt.legend(["prediction", "real value"])
+    # plt.show()
 
-    # interquantile_range(df)
 ####################################################
 # plot linear regression
 ###################################################
-    for col in df.columns[5:]:
-        try :
-            x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
-            y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
-            if len(np.unique(x))==1:
-                continue
-            sm.qqplot(x, line="45")
-            plt.title(col)
-            plt.show()
-            res = linregress(x, y)
-            corr_spr= spearmanr(x, y)
-            pears= pearsonr(x, y)
-            plt.figure(figsize=(10,10))
-            plt.plot(x, y, 'o', label='original data')
-            plt.plot(x, res.intercept + res.slope*x, 'r', label='fitted line')
-            # plt.title(col + " \n " + str(np.square(res.rvalue)) + " - " + str(res.pvalue)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
-            plt.title(col + " \n " +str(res)+"\nspearman "+str(corr_spr) +"\npearson"+str(pears))
-            plt.show()
-        except: 
-            continue
+
+    # out = pd.DataFrame(columns=["Column", "Distribution", "Relation", "r_squared"])
+    # for i, col in enumerate(df.columns[5:]):
+    #     x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
+    #     y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
+    #
+    #     if len(np.unique(x))==1:
+    #         print(df.columns[i])
+    #         continue
+    #
+    #     k2, p = normaltest(x)
+    #     sm.qqplot(x, line="45")
+    #     plt.title(col + "stat" + str(k2) + "pval : "+ str(p))
+    #     # plt.show()
+    #
+    #     slope, intercept, rvalue, pvalue, stderr= linregress(x, y)
+    #     stat_sp, pval_sp = spearmanr(x, y)
+    #     stat_p, pval_p = pearsonr(x, y)
+    #     plt.figure(figsize=(10,10))
+    #     plt.plot(x, y, 'o', label='original data')
+    #     plt.plot(x, intercept + slope*x, 'r', label='fitted line')
+    #     # plt.xlabel(df.columns[i])
+    #     plt.xlabel(col)
+    #     plt.ylabel('YI')
+    #     plt.title(col+" - " +"plot for each YI" +"\nspearman stat:"+str(stat_sp)+" pval:"+ str(pval_sp) +"\npearson stat:"+str(stat_p) + "pval:" + str(pval_p))
+    #     # plt.show()
+    #     plt.clf()
+    #     norm = p
+    #     if pval_p< 0.05 or pval_sp<0.05:
+    #         relation = True
+    #         relation_pow = np.square(np.maximum(np.abs(np.float32(stat_p)),np.abs(np.float32(stat_sp))))*100
+    #     else:
+    #         relation = False
+    #         relation_pow=np.square(np.maximum(np.abs(np.float32(stat_p)),np.abs(np.float32(stat_sp))))*100
+    #
+    #     out.loc[i] = [col, norm, relation, relation_pow]
+    # out.to_csv("data/lineNot8_notUwg.csv")

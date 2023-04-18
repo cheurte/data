@@ -27,7 +27,7 @@ def get_colors(config)->pd.DataFrame:
     """ Read and return the quality data """
     return pd.read_csv(
         config["Data"]["colors"],
-        usecols=["Produktname","Uhrzeit","Line", "Charge", "L", "a", "b", "YI"],
+        usecols=["Produktname","Uhrzeit","Produktionsanlage", "Charge", "L*(D65)", "a*(D65)", "b*(D65)", "YI(E313-98)(D65)"],
         encoding="utf-8", 
         encoding_errors="backslashreplace")
 
@@ -67,7 +67,7 @@ def connect_colors_headers(df_header: pd.DataFrame, df_quality: pd.DataFrame)->p
     for _, value in df_quality.iterrows():
         """ Looking first with the charge number, then with line """
         df_curr = df_header[df_header["charge"] == np.int32(value.Charge)]
-        df_curr = df_curr[df_curr['Kst Id'] == value.Line.replace(".", "/")]
+        df_curr = df_curr[df_curr['Kst Id'] == value.Produktionsanlage.replace(".", "/")]
         if not df_curr.empty :
             start_time = pd.concat([start_time, df_curr.Beginn])
             end_time = pd.concat([end_time, df_curr.Ende])
@@ -94,13 +94,16 @@ def run_cleaning_colors(config)->pd.DataFrame:
     """ Get the data from the raw file """
     df_raw = get_colors(config)
     df_raw.drop_duplicates(inplace=True, ignore_index=True)
-    df_raw = clean_general(df_raw, "Line", None, None, None, "m", "o", "a", "°", "+", "e", "..", ":")
+    df_raw = clean_general(df_raw, "Produktionsanlage", None, None, None, "m", "o", "a", "°", "+", "e", "..", ":")
+    df_raw = clean_general(df_raw, "YI(E313-98)(D65)", None, None, None, "-")
     df_raw = clean_general_reverse(df_raw, "Produktname", "BP 110/02")
     df_raw = clean_general(df_raw, "Produktname", None, None, None, "EXP")
-    df_raw = clean_general(df_raw, "Charge", 8, None, None, "-", "A", "N", ".", "U")
+    # df_raw = clean_general(df_raw, "Charge", 8, None, None, "-", "A", "N", ".", "U")
+    # print(df_raw.Charge.unique())
     df_raw = clean_general(df_raw, "Uhrzeit", None, 5, None, "a", "e", "i")
-    """ Connection of the production with the quality """
+    # """ Connection of the production with the quality """
     df_header = connect_header_data(config,get_data_enemeter(config))
+    # print(df_raw)
     df_out = connect_colors_headers(df_header, df_raw)
     return df_out
 
