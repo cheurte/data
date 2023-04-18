@@ -76,3 +76,18 @@ Train Epoch: 73999	Train loss: 17.80634918191936	Validation Loss : 43.4908503188
 Train Epoch: 74999	Train loss: 17.771625102031976	Validation Loss : 43.49945036603458
 Train Epoch: 75999	Train loss: 17.737435564980842	Validation Loss : 43.50943188480453
 Train Epoch: 76999	Train loss: 17.703937516664155	Validation Loss : 43.52025162990807
+Train Epoch: 77999	Train loss: 17.670949828461744	Validation Loss : 43.532246329790944
+Train Epoch: 78999	Train loss: 17.638405470643193	Validation Loss : 43.545682377124734
+Train Epoch: 79999	Train loss: 17.606195356347598	Validation Loss : 43.56049722047994
+Test of the model
+/home/cheurte/Documents/data/output/fcc4_1/model_fcc4.pt
+<bound method Module.parameters of LinearModel(
+  (fc1): Linear(in_features=7, out_features=10, bias=True)
+  (fc2): Linear(in_features=10, out_features=20, bias=True)
+  (fc3): Linear(in_features=20, out_features=20, bias=True)
+  (fc4): Linear(in_features=20, out_features=10, bias=True)
+  (fc_out): Linear(in_features=10, out_features=1, bias=True)
+)>
+MSE : 2.6675734519958496	MSE to beat : 2.5921116068626815
+MAE : 1.4789533615112305	MAE to beat : 1.472120994471873
+time taken : 3328.0956366062164
