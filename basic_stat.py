@@ -3,17 +3,19 @@ import argparse
 import os
 from ssl import DefaultVerifyPaths
 import sys
+from matplotlib import use
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from scipy.stats import spearmanr, linregress, pearsonr, normaltest
-from sklearn.preprocessing import StandardScaler
+from scipy.stats import spearmanr, pearsonr, normaltest
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
+from sklearn.metrics import mean_squared_error
 
 from utils import read_json
-
 
 def preprocessing_quality(df: pd.DataFrame, column:str, min_val=None):
     return df[df[column] > min_val]
@@ -133,6 +135,7 @@ def interquantile_range(df:pd.DataFrame):
         except BaseException as _:
             continue
 
+
 if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
@@ -144,18 +147,20 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser("Basic config")
     parser.add_argument("--config", "-c", default=default_config)
     config = read_json(parser.parse_args().config)
-
     df = pd.read_csv(
         os.path.join(config["Data"]["backup"],"production_colors_uwg_mean.csv"),
         usecols=config["Data"]["columns_uwg"])
     df = df[df.Line=="ZSK 70.8"]
+    df_test = pd.read_csv(
+            "backup/production_colors_uwg_mean_test.csv",
+            usecols=config["Data"]["columns_uwg"])
 
 ####################################################
 # preprocessing
 ###################################################
     # for line 8 not uwg
     # df= preprocessing_low(df, 0.10, 5, 9, 10, 15, 33)
-    # df = preprocessing_high(df, 0.95, 5)
+    # df = preprocessing_high(df, 0.95, 5, 11)
     # df= preprocessing_low(df, 0.10, 5,  9)
     # df= preprocessing_low(df, 0.05,   9)
     #
@@ -178,13 +183,17 @@ if __name__=="__main__":
     # df= preprocessing_low(df, 0.07, "A0", "A2","A12", "A18")
     # df= preprocessing_high(df, 0.95, "A0","A5","A6")
 
+    # for mean uwg line 8 but only when a few inputs in     
+    # df = preprocessing_low(df, 0.07, "A4", "A5")
+    # df = preprocessing_high(df, 0.95, "A5","A13")
+
     # Special with chosen inputs
     # df= preprocessing_low(df, 0.06, "A4", "A14")
 
 #####################################################
 # print simple
 #####################################################
-    # print_simple(data=df)
+    # print_simple(data=df_test)
 #####################################################
 # simple regression
 #####################################################
@@ -202,27 +211,81 @@ if __name__=="__main__":
     # plt.plot(np.arange(len(pred)), pred, "*")
     # plt.plot(np.arange(len(pred)), y_test.values, "*")
     # plt.show()
-    # column_tested = ['Temperatures_Reg11_Sps_Istwert', 'Temperatures_Reg12_Sps_Istwert', 'Misc_Hat_Sps_Drehmoment_Istwert', 'Feeder_Dos04_Sps_MotorStellwert', 'Feeder_Dos02_Sps_Dosierfaktor','Feeder_Dos04_Sps_MotorDrehzahl','Feeder_Dos05_Sps_MotorStellwert', 'Feeder_Dos04_Sps_Dosierfaktor', 'Feeder_Dos05_Sps_Dosierfaktor', 'Feeder_Dos05_Sps_MotorDrehzahl']
-    # column_tested = ['A4', 'A5', 'A13', 'A26' , 'A2', 'A14', 'A15', 'A16']
+    # column_tested = ['Temperatures_Reg11_Sps_Istwert',
+    #                  'Temperatures_Reg12_Sps_Istwert',
+    #                  'Misc_Hat_Sps_Drehmoment_Istwert',
+    #                  'Feeder_Dos04_Sps_MotorStellwert',
+    #                  'Feeder_Dos02_Sps_Dosierfaktor',
+    #                  'Feeder_Dos04_Sps_MotorDrehzahl',
+    #                  'Feeder_Dos05_Sps_MotorStellwert',
+    #                  'Feeder_Dos04_Sps_Dosierfaktor',
+    #                  'Feeder_Dos05_Sps_Dosierfaktor',
+    #                  'Feeder_Dos05_Sps_MotorDrehzahl',
+    #                  ]
+    column_tested = [
+            # "A2",
+            # "A4",
+            # "A5",
+            # "A13",
+            # "A26" ,
+            # "A14",
+            # "A15",
+            # "A16"
+            ]
+    # print(df_test)
+    # assert False
     # column_tested = ['Temperatures_Reg09_Sps_Istwert', 'Temperatures_AE_Materialtemperatur01', 'Feeder_Dos03_Sps_Dosierfaktor']
-    # x = df[column_tested]
-    # y = df["YI"]
-    # # x = np.squeeze(StandardScaler().fit_transform(df[col].values.reshape(-1, 1)))
-    # # y = np.squeeze(StandardScaler().fit_transform(df["YI"].values.reshape(-1, 1)))
-    #
-    # regr = LinearRegression().fit(x, y)
-    # # print(regr.coef_)
-    # # print(regr.intercept_)
-    # print(regr.score(x, y))
-    # pred = regr.predict(x)
-    # col = " - ".join(column_tested)
-    # plt.title(f"Score : {regr.score(x, y)*100}%\nInput of the model {col}")
-    # plt.xlabel("enumeration of YI values")
-    # plt.ylabel("YI value")
-    # plt.plot(np.arange(len(pred)), pred, "*")
-    # plt.plot(np.arange(len(pred)), y.values, "*")
-    # plt.legend(["prediction", "real value"])
-    # plt.show()
+    ss = StandardScaler()
+    mm = MinMaxScaler()
+
+    X = df[column_tested]
+    y = df["YI"]
+
+    X = ss.fit_transform(X)
+    y = mm.fit_transform(y.values.reshape(-1,1))
+
+    X_test = df_test[column_tested]
+    y_test = df_test["YI"]
+    X_test = ss.fit_transform(X_test)
+
+    svr_rbf = SVR(kernel="rbf", C=10 , gamma="auto", degree=3, epsilon=0.1)#, tol=1e-5)
+    svr_lin = SVR(kernel="linear", C=100, gamma="auto")
+    svr_poly = SVR(kernel="poly", C=100, gamma="auto", degree=3, epsilon=1e-5, coef0=1)
+
+    model = svr_rbf.fit(X,np.squeeze(y))
+    # model = svr_poly.fit(X, np.squeeze(y))
+    # model = svr_lin.fit(X, np.squeeze(y))
+    fig, axes = plt.subplots(nrows=2, ncols=2)
+    pred = model.predict(X_test)
+    pred = mm.inverse_transform(pred.reshape(-1,1))
+    pred_train = model.predict(X)
+    pred_train = mm.inverse_transform(pred_train.reshape(-1,1))
+
+    axes[0, 0].set_title(mean_squared_error(mm.inverse_transform(y), pred_train))
+    axes[0, 0].plot(np.arange(len(pred_train)), mm.inverse_transform(y), "*")
+    axes[0, 0].plot(np.arange(len(pred_train)), pred_train, "*")
+    axes[0, 0].legend(["real values", "prediction"])
+
+    axes[0, 1].set_title(mean_squared_error(y_test.values,np.squeeze(pred)))
+    axes[0, 1].plot(np.arange(len(pred)), y_test, "*")
+    axes[0, 1].plot(np.arange(len(pred)), pred, "*")
+    axes[0, 1].legend(["real values", "prediction"])
+
+    regr = LinearRegression().fit(X, y)
+    pred = mm.inverse_transform(regr.predict(X_test))
+    pred_train = regr.predict(X)
+    pred_train = mm.inverse_transform(pred_train.reshape(-1,1))
+
+    axes[1, 0].set_title(mean_squared_error(mm.inverse_transform(y), pred_train))
+    axes[1, 0].plot(np.arange(len(pred_train)), mm.inverse_transform(y), "*")
+    axes[1, 0].plot(np.arange(len(pred_train)), pred_train, "*")
+    axes[1, 0].legend([ "real value", "prediction"])
+
+    axes[1, 1].set_title(f"{mean_squared_error(y_test.values, np.squeeze(pred))}")
+    axes[1, 1].plot(np.arange(len(pred)), y_test, "*")
+    axes[1, 1].plot(np.arange(len(pred)), pred, "*")
+    axes[1, 1].legend([ "real value","prediction"])
+    plt.show()
 
 ####################################################
 # plot linear regression
@@ -240,7 +303,7 @@ if __name__=="__main__":
     #     k2, p = normaltest(x)
     #     sm.qqplot(x, line="45")
     #     plt.title(col + "stat" + str(k2) + "pval : "+ str(p))
-    #     # plt.show()
+    #     plt.show()
     #
     #     slope, intercept, rvalue, pvalue, stderr= linregress(x, y)
     #     stat_sp, pval_sp = spearmanr(x, y)
@@ -252,7 +315,7 @@ if __name__=="__main__":
     #     plt.xlabel(col)
     #     plt.ylabel('YI')
     #     plt.title(col+" - " +"plot for each YI" +"\nspearman stat:"+str(stat_sp)+" pval:"+ str(pval_sp) +"\npearson stat:"+str(stat_p) + "pval:" + str(pval_p))
-    #     # plt.show()
+    #     plt.show()
     #     plt.clf()
     #     norm = p
     #     if pval_p< 0.05 or pval_sp<0.05:

@@ -1,0 +1,34 @@
+{
+    "model": {
+        "type": "fcc3",
+        "output_classes":1,
+        "size_hidden_unit":20
+    },
+    "training": {
+        "loss": "MSE",
+        "optimizer": "adam",
+        "learning_rate": 1e-5,
+        "max_epoch":20000 
+    },
+    "Data": {
+        "batch_size":16,
+        "shuffle":true,
+        "backup": "/home/cheurte/Documents/data/backup/",
+        "columns_uwg_training":[
+            "A2",
+            "A4",
+            "A5",
+            "A13",
+            "A26" ,
+            "A14",
+            "A15",
+            "A16",
+            "YI"
+        ]
+    },
+    "visu": {
+        "output": "/home/cheurte/Documents/data/output/fcc3_2/",
+        "name_model": "model_fcc3_2"
+
+    }
+}

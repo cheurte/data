@@ -34,7 +34,7 @@ def train_fc(config)->None:
         os.makedirs(config['visu']['output'])
 
     train_loader, validate_loader, df_colors = load_data(config_colors=config)
-    
+
     model = chose_model(config, device, df_colors)
     criterion = nn.MSELoss() # mean-squared error for regression
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['learning_rate'])
@@ -46,7 +46,7 @@ def train_fc(config)->None:
     loss = list()
 
     start = time()
-
+    # last_loss_epoch = 0
     # try:
     for epoch in range(config['training']['max_epoch']):
         model.train()
@@ -64,6 +64,13 @@ def train_fc(config)->None:
         if epoch %1000 == 999:
             print(f'Train Epoch: {epoch}\tTrain loss: {train_loss/len(train_loader)}\tValidation Loss : {validation_loss/len(validate_loader)}')
             loss.append((train_loss, validation_loss))
+                        
+            # if epoch > 5000:
+            #     if validation_loss > last_loss_epoch:
+            #         print("Breaking early")
+            #         break
+
+            # last_loss_epoch = validation_loss
             train_loss = 0.0
             validation_loss = 0.0
 
@@ -71,6 +78,7 @@ def train_fc(config)->None:
             print_during_training(config, epoch, file_number, model, validate_loader)
             file_number += 1
             plt.close("all") 
+        
 
     plot_loss(config=config, df_loss=DataFrame(loss, columns=['Train_loss', 'Validate_loss']))
     plt.clf()

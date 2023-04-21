@@ -1,0 +1,32 @@
+TRAINING PHASE
+Train Epoch: 999	Train loss: 38.91345989061617	Validation Loss : 58.74380299007268
+Train Epoch: 1999	Train loss: 32.100670972807954	Validation Loss : 53.91225392030296
+Train Epoch: 2999	Train loss: 23.554918423610797	Validation Loss : 34.06265564084475
+Train Epoch: 3999	Train loss: 19.415576993030786	Validation Loss : 27.36365054712833
+Train Epoch: 4999	Train loss: 18.70631004001601	Validation Loss : 27.788428123752247
+Train Epoch: 5999	Train loss: 18.3316703719783	Validation Loss : 28.477667654978838
+Train Epoch: 6999	Train loss: 17.9414569981815	Validation Loss : 29.030781457946354
+Train Epoch: 7999	Train loss: 17.705055465907694	Validation Loss : 29.46169907398335
+Train Epoch: 8999	Train loss: 17.552725330728588	Validation Loss : 29.76296377733109
+Train Epoch: 9999	Train loss: 17.32628410194081	Validation Loss : 30.025420466020584
+Train Epoch: 10999	Train loss: 17.18051989358734	Validation Loss : 30.19939337527868
+Train Epoch: 11999	Train loss: 17.07860048664831	Validation Loss : 30.327173634113453
+Train Epoch: 12999	Train loss: 17.055821862896604	Validation Loss : 30.45019524812685
+Train Epoch: 13999	Train loss: 16.944424433453968	Validation Loss : 30.570984377585734
+Train Epoch: 14999	Train loss: 16.905498286599563	Validation Loss : 30.671741640366506
+Train Epoch: 15999	Train loss: 16.80557277463304	Validation Loss : 30.796089510774884
+Train Epoch: 16999	Train loss: 16.718452027618394	Validation Loss : 30.925851892146323
+Train Epoch: 17999	Train loss: 16.67934278727395	Validation Loss : 31.014168802402633
+Train Epoch: 18999	Train loss: 16.609945520906802	Validation Loss : 31.15762997907307
+Train Epoch: 19999	Train loss: 16.593129317024797	Validation Loss : 31.28167675822932
+Test of the model
+/home/cheurte/Documents/data/output/fcc3_2/model_fcc3.pt
+<bound method Module.parameters of LinearModel(
+  (fc1): Linear(in_features=8, out_features=10, bias=True)
+  (fc2): Linear(in_features=10, out_features=20, bias=True)
+  (fc3): Linear(in_features=20, out_features=10, bias=True)
+  (fc_out): Linear(in_features=10, out_features=1, bias=True)
+)>
+MSE : 2.4568443298339844	MSE to beat : 2.148878333628024
+MAE : 1.414503812789917	MAE to beat : 1.3345008891335641
+time taken : 1181.4828038215637

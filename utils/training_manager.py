@@ -59,7 +59,7 @@ def load_data(config_colors: dict):
     """ Load the data for the color """
     device = "cuda:0"
     df_colors = pd.read_csv(
-        os.path.join(config_colors["Data"]["backup"],"production_colors_uwg.csv"),
+        os.path.join(config_colors["Data"]["backup"],"production_colors_uwg_mean.csv"),
         usecols=config_colors["Data"]["columns_uwg_training"])
     
     df_colors= preprocessing_low(df_colors, 0.07, "A4", "A5")

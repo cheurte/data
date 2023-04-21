@@ -7,14 +7,15 @@
     "training": {
         "loss": "MSE",
         "optimizer": "adam",
-        "learning_rate": 1e-4,
+        "learning_rate": 1e-5,
         "max_epoch":80000 
     },
     "Data": {
         "batch_size":16,
         "shuffle":false,
         "backup": "/home/cheurte/Documents/data/backup/",
-        "columns_uwg_training":["A2",
+        "columns_uwg_training":[
+            "A2",
             "A4",
             "A5",
             "A13",
