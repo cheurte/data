@@ -148,12 +148,9 @@ if __name__=="__main__":
     parser.add_argument("--config", "-c", default=default_config)
     config = read_json(parser.parse_args().config)
     df = pd.read_csv(
-        os.path.join(config["Data"]["backup"],"production_colors_uwg_mean.csv"),
-        usecols=config["Data"]["columns_uwg"])
-    df = df[df.Line=="ZSK 70.8"]
-    df_test = pd.read_csv(
-            "backup/production_colors_uwg_mean_test.csv",
-            usecols=config["Data"]["columns_uwg"])
+        os.path.join(config["Data"]["backup"],"production_colors_uwg_mean_normal.csv"),
+        usecols=config["Data"]["columns_uwg_normales"])
+    # df = df[df.Line=="ZSK 69.8"]
 
 ####################################################
 # preprocessing
@@ -185,7 +182,7 @@ if __name__=="__main__":
 
     # for mean uwg line 8 but only when a few inputs in     
     # df = preprocessing_low(df, 0.07, "A4", "A5")
-    # df = preprocessing_high(df, 0.95, "A5","A13")
+    # df = preprocessing_high(df, 0.95, "A5", "A13")
 
     # Special with chosen inputs
     # df= preprocessing_low(df, 0.06, "A4", "A14")
@@ -193,73 +190,60 @@ if __name__=="__main__":
 #####################################################
 # print simple
 #####################################################
-    # print_simple(data=df_test)
+    # print_simple(data=df)
 #####################################################
 # simple regression
 #####################################################
-    # df_train = df[:np.int32(0.8*len(df))]
-    # df_test = df[np.int32(0.8*len(df)):]
-    # x_train = df_train[["Temperatures_Reg11_Sps_Istwert","Temperatures_Reg12_Sps_Istwert"]]
-    # y_train = df_train["YI"]
-    # x_test  = df_test[["Temperatures_Reg11_Sps_Istwert","Temperatures_Reg12_Sps_Istwert"]]
-    # y_test  = df_test["YI"]
-    #
-    # regr = LinearRegression().fit(x_train, y_train)
-    # # print(regr.coef_)
-    # # print(regr.score(x_test, y_test))
-    # pred = regr.predict(x_test)
-    # plt.plot(np.arange(len(pred)), pred, "*")
-    # plt.plot(np.arange(len(pred)), y_test.values, "*")
-    # plt.show()
-    # column_tested = ['Temperatures_Reg11_Sps_Istwert',
-    #                  'Temperatures_Reg12_Sps_Istwert',
-    #                  'Misc_Hat_Sps_Drehmoment_Istwert',
-    #                  'Feeder_Dos04_Sps_MotorStellwert',
-    #                  'Feeder_Dos02_Sps_Dosierfaktor',
-    #                  'Feeder_Dos04_Sps_MotorDrehzahl',
-    #                  'Feeder_Dos05_Sps_MotorStellwert',
-    #                  'Feeder_Dos04_Sps_Dosierfaktor',
-    #                  'Feeder_Dos05_Sps_Dosierfaktor',
-    #                  'Feeder_Dos05_Sps_MotorDrehzahl',
-    #                  ]
     column_tested = [
-            # "A2",
-            # "A4",
-            # "A5",
-            # "A13",
-            # "A26" ,
-            # "A14",
-            # "A15",
-            # "A16"
+            'Temperatures_Reg11_Sps_Istwert',
+            'Temperatures_Reg12_Sps_Istwert',
+            'Misc_Hat_Sps_Drehmoment_Istwert',
+            'Feeder_Dos04_Sps_MotorStellwert',
+            'Feeder_Dos02_Sps_Dosierfaktor',
+            'Feeder_Dos04_Sps_MotorDrehzahl',
+            'Feeder_Dos05_Sps_MotorStellwert',
+            'Feeder_Dos04_Sps_Dosierfaktor',
+            'Feeder_Dos05_Sps_Dosierfaktor',
+            'Feeder_Dos05_Sps_MotorDrehzahl',
+            "A2",
+            "A4",
+            "A5",
+            "A13",
+            "A26" ,
+            "A14",
+            "A15",
+            "A16"
             ]
-    # print(df_test)
-    # assert False
-    # column_tested = ['Temperatures_Reg09_Sps_Istwert', 'Temperatures_AE_Materialtemperatur01', 'Feeder_Dos03_Sps_Dosierfaktor']
     ss = StandardScaler()
     mm = MinMaxScaler()
+    #
+    df_train = df[:np.int32(len(df)*0.8)]
+    df_test = df[np.int32(len(df)*0.8):]
 
-    X = df[column_tested]
-    y = df["YI"]
-
+    X = df_train[column_tested]
+    y = df_train["YI"]
+    #
     X = ss.fit_transform(X)
     y = mm.fit_transform(y.values.reshape(-1,1))
-
+    #
     X_test = df_test[column_tested]
     y_test = df_test["YI"]
     X_test = ss.fit_transform(X_test)
-
-    svr_rbf = SVR(kernel="rbf", C=10 , gamma="auto", degree=3, epsilon=0.1)#, tol=1e-5)
+    #
+    svr_rbf = SVR(kernel="rbf", C=200 , gamma="auto", degree=3, epsilon=1e-5)#, tol=1e-5)
     svr_lin = SVR(kernel="linear", C=100, gamma="auto")
-    svr_poly = SVR(kernel="poly", C=100, gamma="auto", degree=3, epsilon=1e-5, coef0=1)
-
+    svr_poly = SVR(kernel="poly", C=100, gamma="auto", degree=2, epsilon=1e-1, coef0=1)
+    #
     model = svr_rbf.fit(X,np.squeeze(y))
     # model = svr_poly.fit(X, np.squeeze(y))
-    # model = svr_lin.fit(X, np.squeeze(y))
+    # # model = svr_lin.fit(X, np.squeeze(y))
     fig, axes = plt.subplots(nrows=2, ncols=2)
     pred = model.predict(X_test)
+
     pred = mm.inverse_transform(pred.reshape(-1,1))
     pred_train = model.predict(X)
     pred_train = mm.inverse_transform(pred_train.reshape(-1,1))
+
 
     axes[0, 0].set_title(mean_squared_error(mm.inverse_transform(y), pred_train))
     axes[0, 0].plot(np.arange(len(pred_train)), mm.inverse_transform(y), "*")
@@ -286,7 +270,7 @@ if __name__=="__main__":
     axes[1, 1].plot(np.arange(len(pred)), pred, "*")
     axes[1, 1].legend([ "real value","prediction"])
     plt.show()
-
+    #
 ####################################################
 # plot linear regression
 ###################################################
