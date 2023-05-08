@@ -8,12 +8,13 @@ from matplotlib import use
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.sparse import find
 import statsmodels.api as sm
 from scipy.stats import spearmanr, pearsonr, normaltest
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 from utils import read_json
 
@@ -93,15 +94,9 @@ def list_entries(config: dict)-> None:
 
     _ = [print(i, col) for i, col in enumerate(df_list.columns)]
 
-def print_relationship( df: pd.DataFrame, *columns: str ):
-    """ Plot graph between two variables """
-    plt.plot(df[columns[0]], df[columns[1]], "*")
-    plt.title(f"Relation bewteen {columns[0]} and {columns[1]}")
-    plt.xlabel(columns[0])
-    plt.ylabel((columns[1]))
-    plt.show()
-
-def print_independant(df:pd.DataFrame, scale:bool ,*columns: str | int):
+"""
+Function to print the relation between two inputs particulary"""
+def print_independant(df:pd.DataFrame, scale:bool ,*columns: str | int)->None:
     """ plot data on the same line """
 
     _, axes = plt.subplots(nrows=1, ncols=2, layout="constrained")
@@ -126,7 +121,9 @@ def print_independant(df:pd.DataFrame, scale:bool ,*columns: str | int):
     mng.full_screen_toggle()
     plt.show()
 
-def interquantile_range(df:pd.DataFrame):
+"""
+Plotting box plot for all the inputs"""
+def interquantile_range(df:pd.DataFrame)->None:
     for column in df.columns:
         try:
             plt.boxplot(df[column])
@@ -135,7 +132,162 @@ def interquantile_range(df:pd.DataFrame):
         except BaseException as _:
             continue
 
+"""
+Plot the prediction by using the SVR predictor and the linear regression
+predictor"""
+def print_svr_linear(df_data: pd.DataFrame, scale_valid_test:float, c_reg: int, column: list, epsilon: np.float32)->None:
+    """ Print prediction with SVR compared to linear one """
+    standart_scal = StandardScaler()
+    min_max_scal = MinMaxScaler()
 
+    df_train = df_data[:np.int32(len(df_data)*scale_valid_test)]
+    df_test = df_data[np.int32(len(df_data)*scale_valid_test):]
+
+    x_data = df_train[column]
+    y_data = df_train["YI"]
+
+    x_data = standart_scal.fit_transform(x_data)
+    y_data = min_max_scal.fit_transform(y_data.values.reshape(-1,1))
+
+    x_test = df_test[column_tested]
+    y_test = df_test["YI"]
+    x_test = standart_scal.fit_transform(x_test)
+
+    svr_rbf = SVR(kernel="rbf", C=c_reg, gamma="scale", epsilon=epsilon.item())
+    model = svr_rbf.fit(x_data,np.squeeze(y_data))
+
+    _, axes = plt.subplots(nrows=2, ncols=2)
+    plt.suptitle(f"c : {c_reg}, epsilon : {eps}")
+    pred = model.predict(x_test)
+
+    pred = min_max_scal.inverse_transform(pred.reshape(-1,1))
+    pred_train = model.predict(x_data)
+    pred_train = min_max_scal.inverse_transform(pred_train.reshape(-1,1))
+
+    axes[0, 0].set_title(mean_absolute_error(min_max_scal.inverse_transform(y_data), pred_train))
+    axes[0, 0].plot(np.arange(len(pred_train)), min_max_scal.inverse_transform(y_data), "*")
+    axes[0, 0].plot(np.arange(len(pred_train)), pred_train, "*")
+    axes[0, 0].legend(["real values", "prediction"])
+
+    df_pred = {"y":np.squeeze(y_test.values), "pred":np.squeeze(pred)}
+    df_pred = pd.DataFrame(df_pred)
+    df_pred = df_pred.sort_values(by=["y"])
+
+    # res.append((mean_absolute_error(y_test.values,np.squeeze(pred)), c))
+    axes[0, 1].set_title(mean_absolute_error(y_test.values,np.squeeze(pred)))
+    axes[0, 1].plot(np.arange(len(pred)), df_pred.y, "*")
+    axes[0, 1].plot(np.arange(len(pred)), df_pred.pred, "*")
+    axes[0, 1].legend(["real values", "prediction"])
+
+    regr = LinearRegression().fit(x_data, y_data)
+    pred = min_max_scal.inverse_transform(regr.predict(x_test))
+    pred_train = regr.predict(x_data)
+    pred_train = min_max_scal.inverse_transform(pred_train.reshape(-1,1))
+
+    axes[1, 0].set_title(mean_absolute_error(min_max_scal.inverse_transform(y_data), pred_train))
+    axes[1, 0].plot(np.arange(len(pred_train)), min_max_scal.inverse_transform(y_data), "*")
+    axes[1, 0].plot(np.arange(len(pred_train)), pred_train, "*")
+    axes[1, 0].legend([ "real value", "prediction"])
+
+    df_pred = {"y":np.squeeze(y_test.values), "pred":np.squeeze(pred)}
+    df_pred = pd.DataFrame(df_pred)
+    df_pred = df_pred.sort_values(by=["y"])
+
+    axes[1, 1].set_title(f"{mean_absolute_error(np.squeeze(y_test.values), np.squeeze(pred))}")
+    axes[1, 1].plot(np.arange(len(df_pred)), df_pred.y, "*")
+    axes[1, 1].plot(np.arange(len(df_pred)), df_pred.pred, "*")
+    axes[1, 1].legend([ "real value","prediction"])
+    plt.show()
+
+"""
+Function to find the best c parameter for the support vector regression"""
+def find_best_c_reg(df_data:pd.DataFrame, column_tested:list,  scale_valid_test: float, plot:bool, *range_for: int):
+    standart_scal = StandardScaler()
+    min_max_scal = MinMaxScaler()
+
+    df_train = df_data[:np.int32(len(df_data)*scale_valid_test)]
+    df_test = df_data[np.int32(len(df_data)*scale_valid_test):]
+
+    x_data = df_train[column_tested]
+    y_data = df_train["YI"]
+
+    x_data = standart_scal.fit_transform(x_data)
+    y_data = min_max_scal.fit_transform(y_data.values.reshape(-1,1))
+
+    x_test = df_test[column_tested]
+    y_test = df_test["YI"]
+    x_test = standart_scal.fit_transform(x_test)
+    res = []
+    for c in range(range_for[0],range_for[1]):
+
+        svr_rbf = SVR(kernel="rbf", C=c, gamma="scale", epsilon=1e-1)#, tol=1e-5)
+
+        model = svr_rbf.fit(x_data,np.squeeze(y_data))
+        pred = model.predict(x_test)
+
+        pred = min_max_scal.inverse_transform(pred.reshape(-1,1))
+        pred_train = model.predict(x_data)
+        pred_train = min_max_scal.inverse_transform(pred_train.reshape(-1,1))
+
+        df_pred = {"y":np.squeeze(y_test.values), "pred":np.squeeze(pred)}
+        df_pred = pd.DataFrame(df_pred)
+        df_pred = df_pred.sort_values(by=["y"])
+
+        res.append((mean_absolute_error(y_test.values,np.squeeze(pred)), c))
+    res = np.squeeze(np.array(res))
+    min_error = np.ndarray.min(res, axis = 0)[0]
+    c = np.where(res[:,0] == min_error)[0]
+    if plot:
+        plt.plot(res[:,1], res[:,0])
+        plt.show()
+    return c[0]+1, min_error
+
+"""
+Find best epsilon"""
+def find_best_epsilon(df_data:pd.DataFrame, column_tested:list,  scale_valid_test: float, plot:bool, c:int):
+    standart_scal = StandardScaler()
+    min_max_scal = MinMaxScaler()
+
+    df_train = df_data[:np.int32(len(df_data)*scale_valid_test)]
+    df_test = df_data[np.int32(len(df_data)*scale_valid_test):]
+
+    x_data = df_train[column_tested]
+    y_data = df_train["YI"]
+
+    x_data = standart_scal.fit_transform(x_data)
+    y_data = min_max_scal.fit_transform(y_data.values.reshape(-1,1))
+
+    x_test = df_test[column_tested]
+    y_test = df_test["YI"]
+    x_test = standart_scal.fit_transform(x_test)
+    res = []
+    for eps in range(1,6):
+        eps = 1/np.power(10,eps)
+
+        svr_rbf = SVR(kernel="rbf", C=c, gamma="scale", epsilon=eps)#, tol=1e-5)
+
+        model = svr_rbf.fit(x_data,np.squeeze(y_data))
+        pred = model.predict(x_test)
+
+        pred = min_max_scal.inverse_transform(pred.reshape(-1,1))
+        pred_train = model.predict(x_data)
+        pred_train = min_max_scal.inverse_transform(pred_train.reshape(-1,1))
+
+        df_pred = {"y":np.squeeze(y_test.values), "pred":np.squeeze(pred)}
+        df_pred = pd.DataFrame(df_pred)
+        df_pred = df_pred.sort_values(by=["y"])
+
+        res.append((mean_absolute_error(y_test.values,np.squeeze(pred)), eps))
+    res = np.squeeze(np.array(res))
+    min_error = np.ndarray.min(res, axis = 0)[0]
+    id = np.where(res[:,0] == min_error)[0][0]
+    if plot:
+        plt.plot(res[:,1], res[:,0])
+        plt.show()
+    return res[:,1][id]+0, min_error
+
+"""
+Main function"""
 if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
@@ -151,8 +303,31 @@ if __name__=="__main__":
         os.path.join(config["Data"]["backup"],"production_colors_uwg_mean_normal.csv"),
         usecols=config["Data"]["columns_uwg_normales"])
     # df = df[df.Line=="ZSK 69.8"]
+    column_tested = [
+            'Temperatures_Reg11_Sps_Istwert',
+            'Temperatures_Reg12_Sps_Istwert',
+            'Misc_Hat_Sps_Drehmoment_Istwert',
+            # 'Feeder_Dos04_Sps_MotorStellwert',
+            # 'Feeder_Dos02_Sps_Dosierfaktor',
+            # 'Feeder_Dos04_Sps_MotorDrehzahl',
+            # 'Feeder_Dos05_Sps_MotorStellwert',
+            # 'Feeder_Dos04_Sps_Dosierfaktor',
+            # 'Feeder_Dos05_Sps_Dosierfaktor',
+            # 'Feeder_Dos05_Sps_MotorDrehzahl',
+            "A2",
+            # "A4",
+            # "A5",
+            # "A13",
+            # "A14",
+            "A15",
+            "A16",
+            "A26"
+    ]
+    c, _ = find_best_c_reg(df, column_tested, 0.8, False, 1, 200)
+    eps, _ = find_best_epsilon(df, column_tested, 0.8, False, c)
+    print_svr_linear(df, 0.8, c, column_tested, np.float32(eps))
 
-####################################################
+###################################################
 # preprocessing
 ###################################################
     # for line 8 not uwg
@@ -180,7 +355,7 @@ if __name__=="__main__":
     # df= preprocessing_low(df, 0.07, "A0", "A2","A12", "A18")
     # df= preprocessing_high(df, 0.95, "A0","A5","A6")
 
-    # for mean uwg line 8 but only when a few inputs in     
+    # for mean uwg line 8 but only when a few inputs in
     # df = preprocessing_low(df, 0.07, "A4", "A5")
     # df = preprocessing_high(df, 0.95, "A5", "A13")
 
@@ -194,84 +369,10 @@ if __name__=="__main__":
 #####################################################
 # simple regression
 #####################################################
-    column_tested = [
-            'Temperatures_Reg11_Sps_Istwert',
-            'Temperatures_Reg12_Sps_Istwert',
-            'Misc_Hat_Sps_Drehmoment_Istwert',
-            'Feeder_Dos04_Sps_MotorStellwert',
-            'Feeder_Dos02_Sps_Dosierfaktor',
-            'Feeder_Dos04_Sps_MotorDrehzahl',
-            'Feeder_Dos05_Sps_MotorStellwert',
-            'Feeder_Dos04_Sps_Dosierfaktor',
-            'Feeder_Dos05_Sps_Dosierfaktor',
-            'Feeder_Dos05_Sps_MotorDrehzahl',
-            "A2",
-            "A4",
-            "A5",
-            "A13",
-            "A26" ,
-            "A14",
-            "A15",
-            "A16"
-            ]
-    ss = StandardScaler()
-    mm = MinMaxScaler()
-    #
-    df_train = df[:np.int32(len(df)*0.8)]
-    df_test = df[np.int32(len(df)*0.8):]
+    
 
-    X = df_train[column_tested]
-    y = df_train["YI"]
-    #
-    X = ss.fit_transform(X)
-    y = mm.fit_transform(y.values.reshape(-1,1))
-    #
-    X_test = df_test[column_tested]
-    y_test = df_test["YI"]
-    X_test = ss.fit_transform(X_test)
-    #
-    svr_rbf = SVR(kernel="rbf", C=200 , gamma="auto", degree=3, epsilon=1e-5)#, tol=1e-5)
-    svr_lin = SVR(kernel="linear", C=100, gamma="auto")
-    svr_poly = SVR(kernel="poly", C=100, gamma="auto", degree=2, epsilon=1e-1, coef0=1)
-    #
-    model = svr_rbf.fit(X,np.squeeze(y))
-    # model = svr_poly.fit(X, np.squeeze(y))
-    # # model = svr_lin.fit(X, np.squeeze(y))
-    fig, axes = plt.subplots(nrows=2, ncols=2)
-    pred = model.predict(X_test)
-
-    pred = mm.inverse_transform(pred.reshape(-1,1))
-    pred_train = model.predict(X)
-    pred_train = mm.inverse_transform(pred_train.reshape(-1,1))
-
-
-    axes[0, 0].set_title(mean_squared_error(mm.inverse_transform(y), pred_train))
-    axes[0, 0].plot(np.arange(len(pred_train)), mm.inverse_transform(y), "*")
-    axes[0, 0].plot(np.arange(len(pred_train)), pred_train, "*")
-    axes[0, 0].legend(["real values", "prediction"])
-
-    axes[0, 1].set_title(mean_squared_error(y_test.values,np.squeeze(pred)))
-    axes[0, 1].plot(np.arange(len(pred)), y_test, "*")
-    axes[0, 1].plot(np.arange(len(pred)), pred, "*")
-    axes[0, 1].legend(["real values", "prediction"])
-
-    regr = LinearRegression().fit(X, y)
-    pred = mm.inverse_transform(regr.predict(X_test))
-    pred_train = regr.predict(X)
-    pred_train = mm.inverse_transform(pred_train.reshape(-1,1))
-
-    axes[1, 0].set_title(mean_squared_error(mm.inverse_transform(y), pred_train))
-    axes[1, 0].plot(np.arange(len(pred_train)), mm.inverse_transform(y), "*")
-    axes[1, 0].plot(np.arange(len(pred_train)), pred_train, "*")
-    axes[1, 0].legend([ "real value", "prediction"])
-
-    axes[1, 1].set_title(f"{mean_squared_error(y_test.values, np.squeeze(pred))}")
-    axes[1, 1].plot(np.arange(len(pred)), y_test, "*")
-    axes[1, 1].plot(np.arange(len(pred)), pred, "*")
-    axes[1, 1].legend([ "real value","prediction"])
-    plt.show()
-    #
-####################################################
+    
+    ####################################################
 # plot linear regression
 ###################################################
 
