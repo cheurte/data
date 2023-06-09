@@ -1,12 +1,14 @@
 """Module allowing to get the enemeter files"""
 import argparse
-import os, sys
 from datetime import datetime
 from glob import glob
-from utils import read_json, save_backup_dataframe
+import os
+import sys
 
 import numpy as np
 import pandas as pd
+
+from utils import read_json, save_backup_dataframe
 
 def drop_strange_kst(df: pd.DataFrame)-> pd.DataFrame:
     """Remove value of Kst Id col wich are not KST smthing"""
@@ -62,7 +64,7 @@ def clean_batches(df: pd.DataFrame)-> pd.DataFrame:
 def get_data_enemeter(config)-> pd.DataFrame:
     """Function to get the enemeter data"""
     dfs = []
-    path_files = os.path.join(config['Data']["enermeter"], config["Data"]["bp110_02"])
+    path_files = os.path.join(config['Data']["enermeter"], config["Data"]["g21"])
     for file in glob(os.path.join(path_files, "*.csv")):
         df = pd.read_csv(file, sep=';', encoding_errors="ignore",
             usecols=["Typ","Nr","Artikelnr","Artikelbez 1","Istmenge","Kst Id","Beginn","Ende"])
@@ -77,14 +79,14 @@ def get_data_enemeter(config)-> pd.DataFrame:
     output.reset_index(inplace=True, drop=True)
     if config["Data"]["save_backup"]:
         save_backup_dataframe(config=config, df=output, name=__file__)
-        print("enemeter saved") 
+        print("enemeter saved")
     return output
 
 if __name__=="__main__":
     if "win" in sys.platform:
         default_config = "C:\\Users\\corentin.heurte\\Documents\\data\\config\\config_win.json"
     elif "linux" in sys.platform:
-        default_config = "/home/cheurte/Documents/biotec/sql/config/config.json"
+        default_config = "/home/cheurte/Documents/data/config/config_2.json"
     else:
         raise ValueError ("On which os are you ?")
 
@@ -92,6 +94,12 @@ if __name__=="__main__":
     parser.add_argument("--config", "-c",
                 default=default_config)
     args = parser.parse_args()
-   
+
     config = read_json(args.config)
     df = get_data_enemeter(config)
+    # print(df)
+    a = list()
+    for val in df.Nr:
+        a.append(f"nr = {str(val)} or ")
+    a = "".join(a)
+    print(a)

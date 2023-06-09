@@ -1,0 +1,56 @@
+ZSK 70.7
+
+merkmal id : 197
+Index: 23 entries, 0 to 164
+
+------------------------------
+merkmal id : 198
+Index: 20 entries, 2 to 166
+
+------------------------------
+merkmal id : 100
+Index: 22 entries, 4 to 168
+
+------------------------------
+merkmal id : 203
+Index: 21 entries, 6 to 170
+
+------------------------------
+******************************
+ZSK 70.10
+
+merkmal id : 197
+Index: 16 entries, 1 to 163
+
+------------------------------
+merkmal id : 198
+Index: 17 entries, 3 to 165
+
+------------------------------
+merkmal id : 100
+Index: 19 entries, 5 to 167
+
+------------------------------
+merkmal id : 203
+Index: 17 entries, 7 to 169
+
+------------------------------
+******************************
+ZSK 70.6
+
+merkmal id : 197
+Index: 4 entries, 22 to 25
+
+------------------------------
+merkmal id : 198
+Index: 4 entries, 26 to 29
+
+------------------------------
+merkmal id : 100
+Index: 4 entries, 30 to 33
+
+------------------------------
+merkmal id : 203
+Index: 4 entries, 34 to 37
+
+

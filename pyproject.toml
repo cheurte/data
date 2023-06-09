@@ -1,12 +1,15 @@
 [tool.pyright]
-include = ["utils/", 
+include = ["utils/",
         "models/"]
 
 reportMissingImports = false
 reportMissingTypeStubs = false
 
-pythonVersion = "3.10"
-pythonPlatform = "Linux"
+# pythonVersion = "3.10"
+# pythonPlatform = "Linux"
+
+# venvPath = "/home/cheurte/miniconda3/envs/"
+# venv = "process"
 
 executionEnvironments = [
 ]
